@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <all_checks>
     <checks>
-        <check name="icmp"/>
-        <check name="tcp"/>
+        <check name="CheckICMP"/>
+        <check name="CheckTCP"/>
     </checks>
     <langs>
         <lang name="en"/>
