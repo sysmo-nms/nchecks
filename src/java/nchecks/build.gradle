@@ -6,6 +6,7 @@ apply plugin: 'jdepend'
 // TODO checkstyle
 
 mainClassName = 'io.sysmo.nchecks.NChecks'
+applicationDefaultJvmArgs = ['-server']
 
 
 repositories {
