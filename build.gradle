@@ -1,0 +1,48 @@
+apply plugin: 'java'
+apply plugin: 'pmd'
+apply plugin: 'findbugs'
+apply plugin: 'jdepend'
+
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+
+    // snmp4j
+    maven {
+        url 'https://oosnmp.net/dist/release'
+    }
+
+}
+
+dependencies {
+    testCompile 'junit:junit:4.2'
+}
+
+jdepend  { ignoreFailures = true }
+pmd      { ignoreFailures = true }
+
+findbugs { ignoreFailures = true }
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+javadoc {
+    options.overview = "overview.html"
+    options.docTitle = "NChecks API"
+    options.windowTitle = "NChecks API"
+}
+
+dependencies {
+    compile 'org.erlang.otp:jinterface:1.5.6'
+    compile 'org.glassfish:javax.json:1.0.4'
+    compile 'org.jruby:jruby:1.7.20'
+    compile 'org.snmp4j:snmp4j:2.3.3'
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'org.slf4j:slf4j-jdk14:1.7.12'
+    compile 'com.sleepycat:je:4.0.92'
+    runtime 'org.apache.httpcomponents:httpclient:4.5'
+}
