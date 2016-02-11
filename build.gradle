@@ -8,6 +8,12 @@ apply plugin: 'jdepend'
 sourceCompatibility = 1.7
 group = "io.sysmo"
 archivesBaseName = "nchecks"
+
+/*
+ * "gradle uploadArchives" will upload:
+ * version = "X.X.X"          -> a new release
+ * version = "X.X.X-SNAPSHOT" -> a new snapshot
+ */
 version = "0.9.1-SNAPSHOT"
 
 repositories {
