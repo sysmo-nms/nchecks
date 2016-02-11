@@ -10,3 +10,6 @@ clean:
 
 doc:
 	$(GRADLE) javadoc
+
+publish:
+	$(GRADLE) uploadArchives
