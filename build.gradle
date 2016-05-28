@@ -92,16 +92,16 @@ uploadArchives {
             }
 
             pom.project {
-                name 'nChecks library'
+                name 'nchecks monitoring library'
                 packaging 'jar'
                 // optionally artifactId can be defined here
-                description 'nChecks library'
-                url 'http://nchecks.sysmo.io'
+                description 'nchecks monitoring library'
+                url 'http://www.sysmo.io'
 
                 scm {
-                    connection 'scm:git:git@github.com:://github.com:nChecks/nchecks.git'
-                    developerConnection 'scm:git:git@github.com:://github.com:nChecks/nchecks.git'
-                    url 'git@github.com:nChecks/nchecks.git'
+                    connection 'scm:git:git@github.com:://github.com:sysom-nms/nchecks.git'
+                    developerConnection 'scm:git:git@github.com:://github.com:sysmo-nms/nchecks.git'
+                    url 'git@github.com:sysmo-nms/nchecks.git'
                 }
 
                 licenses {
