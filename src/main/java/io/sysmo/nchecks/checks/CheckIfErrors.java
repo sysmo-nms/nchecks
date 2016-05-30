@@ -22,21 +22,18 @@
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
-import io.sysmo.nchecks.snmp.Manager;
 import io.sysmo.nchecks.Query;
 import io.sysmo.nchecks.Reply;
+import io.sysmo.nchecks.snmp.Walker;
 import io.sysmo.nchecks.states.PerformanceGroupState;
 
 import io.sysmo.nchecks.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.snmp4j.AbstractTarget;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.TableEvent;
-import org.snmp4j.util.TableUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -78,45 +75,33 @@ public class CheckIfErrors implements CheckInterface {
             return reply;
         }
 
+        String[] indexesArrayString = ifSelection.split(",");
+
         PerformanceGroupState state = (PerformanceGroupState) query.getState();
         if (state == null) {
             state = new PerformanceGroupState();
         }
 
+        Walker walker = new Walker();
+        walker.addColumn(IF_INDEX);
+        walker.addColumn(IF_IN_ERRORS);
+        walker.addColumn(IF_OUT_ERRORS);
+        for (String index: indexesArrayString) {
+            walker.addIndex(index);
+        }
+
         HashMap<Integer, Long> newStatusMap = new HashMap<>();
         try {
 
-            // get indexes string list
-            String[] indexesArrayString = ifSelection.split(",");
 
-            // transform to index array int
-            Integer[] indexesArrayInt = new Integer[indexesArrayString.length];
-            for (int i = 0; i < indexesArrayString.length; i++) {
-                indexesArrayInt[i] = Integer.parseInt(indexesArrayString[i]);
-            }
-
-            // sort it
-            Arrays.sort(indexesArrayInt);
-
-            // build upper and lower bound indexes
-            Integer lower = indexesArrayInt[0] - 1;
-            Integer upper = indexesArrayInt[indexesArrayInt.length - 1];
-            OID lowerBoundIndex = new OID(lower.toString());
-            OID upperBoundIndex = new OID(upper.toString());
-
-            // TODO try PDU.GETBULK then PDU.GETNEXT to degrade....
-            // TODO keep degrade state in reply.setState(v)
-            AbstractTarget target = Manager.getTarget(query);
-            TableUtils tableWalker = Manager.getTableUtils(state.getPduType());
-            List<TableEvent> snmpReply = tableWalker.getTable(
-                    target, CheckIfErrors.columns,
-                    lowerBoundIndex, upperBoundIndex);
+            List<TableEvent> snmpReply = walker.walk(query);
 
             // TODO check the last element of the list see TableUtils.getTable
             // and TableEvent.getStatus()
 
             // asList for List.contains
-            List<Integer> intList = Arrays.asList(indexesArrayInt);
+            List<Integer> intList = walker.getIndexes();
+
             Iterator<TableEvent> it = snmpReply.iterator();
             TableEvent evt;
             while (it.hasNext()) {
