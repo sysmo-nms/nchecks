@@ -112,6 +112,7 @@ public class GetIfTableHelper implements HelperInterface {
             TableEvent evt;
 
             HelperTableReply table = new HelperTableReply();
+            int rowCount = 0;
             while (it.hasNext()) {
                 evt = it.next();
                 VariableBinding[]   vbs = evt.getColumns();
@@ -122,13 +123,21 @@ public class GetIfTableHelper implements HelperInterface {
                 row.addItem("ifPhysAddress", vbs[3].getVariable().toString());
                 table.addRow(row);
             }
-            table.setId("SelectNetworkInterfaces");
-            table.setStatus(HelperReply.SUCCESS);
-            table.setMessage("Please select interfaces you want to monitor:");
-            table.setTreeRoot("ifType");
-            table.setSelectColumn("ifIndex");
-            table.setSelectType(HelperTableReply.SELECT_MULTIPLE);
-            table.setListSeparator(",");
+
+            if (rowCount == 0) {
+                table.setId("SelectNetworkInterfaces");
+                table.setStatus(HelperReply.FAILURE);
+                table.setMessage("Unable to get any interfaces from the host");
+            } else {
+                table.setId("SelectNetworkInterfaces");
+                table.setStatus(HelperReply.SUCCESS);
+                table.setMessage("Please select interfaces you want to monitor:");
+                table.setTreeRoot("ifType");
+                table.setSelectColumn("ifIndex");
+                table.setSelectType(HelperTableReply.SELECT_MULTIPLE);
+                table.setListSeparator(",");
+            }
+
             return table;
 
         } catch (Exception|Error e) {
