@@ -82,7 +82,6 @@ public class CheckIfNonUnicast implements CheckInterface {
             state = new PerformanceGroupState();
         }
 
-        HashMap<Integer, Long> newStatusMap = new HashMap<>();
         try {
 
             // get indexes string list
@@ -130,12 +129,11 @@ public class CheckIfNonUnicast implements CheckInterface {
                     reply.putPerformance(ifIndex, "IfInNonUnicast", nuIn);
                     reply.putPerformance(ifIndex, "IfOutNonUnicast", nuOut);
 
-                    newStatusMap.put(ifIndex, nuIn);
+                    state.put(ifIndex, nuIn);
                 }
             }
 
-            Status newStatus = state.computeStatusMaps(
-                    newStatusMap, warningThreshold, criticalThreshold);
+            Status newStatus = state.computeStatusMaps(warningThreshold, criticalThreshold);
 
             String replyMsg;
             if (newStatus.equals(Status.OK)) {

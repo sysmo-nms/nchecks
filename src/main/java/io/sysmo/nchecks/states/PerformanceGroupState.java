@@ -21,11 +21,19 @@ public class PerformanceGroupState implements Serializable {
     private Status status;
     private Date time;
     private HashMap<Integer, Long> data;
+    private HashMap<Integer, Long> update;
 
     public PerformanceGroupState() {
         this.time = null;
         this.pduType = PDU.GETNEXT;
         this.status = Status.UNKNOWN;
+    }
+
+    public void put(Integer index, Long value) {
+        if (this.update == null) {
+            this.update = new HashMap<>();
+        }
+        this.update.put(index, value);
     }
 
     public int getPduType() {
@@ -36,17 +44,17 @@ public class PerformanceGroupState implements Serializable {
      * Take two counter entries from different dates, compare to critical
      * and warning values and return the appropriate status.
      *
-     * @param update   the new value from snmp walk
      * @param warning  the warning threshold
      * @param critical the critical threshold
      * @return the new state
      */
-    public Status computeStatusMaps(HashMap<Integer, Long> update,
-                                    int warning, int critical) {
+    public Status computeStatusMaps(int warning, int critical) {
+
         if (this.time == null) {
             // this is the first compute statusMap, nothing to compare
             this.time = new Date();
-            this.data = update;
+            this.data = this.update;
+            this.update = null;
             return this.status;
         }
 
@@ -70,7 +78,7 @@ public class PerformanceGroupState implements Serializable {
 
         Status newStatus = Status.OK;
         // if one of the key reach threshold value set the new status.
-        for (Map.Entry<Integer, Long> entry : update.entrySet()) {
+        for (Map.Entry<Integer, Long> entry : this.update.entrySet()) {
             Integer key = entry.getKey();
             Long upd = entry.getValue();
             Long old = this.data.get(key);
@@ -98,7 +106,8 @@ public class PerformanceGroupState implements Serializable {
             }
         } else {
             this.time = newDate;
-            this.data = update;
+            this.data = this.update;
+            this.update = null;
             this.status = newStatus;
             return this.status;
         }

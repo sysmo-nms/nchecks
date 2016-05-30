@@ -83,7 +83,6 @@ public class CheckIfXMulticast implements CheckInterface
             state = new PerformanceGroupState();
         }
 
-        HashMap<Integer, Long> newStatusMap = new HashMap<>();
         try {
 
             // get indexes string list
@@ -131,12 +130,12 @@ public class CheckIfXMulticast implements CheckInterface
                     reply.putPerformance(ifIndex, "IfOutMulticastPkts", broadcastIn);
                     reply.putPerformance(ifIndex, "IfInMulticastPkts", broadcastOut);
 
-                    newStatusMap.put(ifIndex, broadcastIn + broadcastOut);
+                    state.put(ifIndex, broadcastIn + broadcastOut);
                 }
             }
 
             Status newStatus = state.computeStatusMaps(
-                    newStatusMap, warningThreshold, criticalThreshold);
+                    warningThreshold, criticalThreshold);
 
             String replyMsg;
             if (newStatus.equals(Status.OK)) {

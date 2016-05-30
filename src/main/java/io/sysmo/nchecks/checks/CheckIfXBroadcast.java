@@ -83,7 +83,6 @@ public class CheckIfXBroadcast implements CheckInterface
             state = new PerformanceGroupState();
         }
 
-        HashMap<Integer, Long> newStatusMap = new HashMap<>();
         try {
 
             // get indexes string list
@@ -131,12 +130,12 @@ public class CheckIfXBroadcast implements CheckInterface
                     reply.putPerformance(ifIndex, "IfOutBroadcastPkts", broadcastIn);
                     reply.putPerformance(ifIndex, "IfInBroadcastPkts", broadcastOut);
 
-                    newStatusMap.put(ifIndex, broadcastIn + broadcastOut);
+                    state.put(ifIndex, broadcastIn + broadcastOut);
                 }
             }
 
             Status newStatus = state.computeStatusMaps(
-                    newStatusMap, warningThreshold, criticalThreshold);
+                    warningThreshold, criticalThreshold);
 
             String replyMsg;
             if (newStatus.equals(Status.OK)) {

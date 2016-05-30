@@ -79,16 +79,12 @@ public class CheckIfTraffic implements CheckInterface
             return reply;
         }
 
-        PerformanceGroupState state = null;
-        // Avoid calling query.getState() if not required.
-        if (warningThreshold != 0 || criticalThreshold != 0) {
-           state = (PerformanceGroupState) query.getState();
-            if (state == null) {
-                state = new PerformanceGroupState();
-            }
+        PerformanceGroupState state;
+        state = (PerformanceGroupState) query.getState();
+        if (state == null) {
+            state = new PerformanceGroupState();
         }
 
-        HashMap<Integer, Long> newStatusMap = new HashMap<>();
         try {
 
             // get indexes string list
@@ -136,34 +132,29 @@ public class CheckIfTraffic implements CheckInterface
                     reply.putPerformance(ifIndex, "IfInOctets", octetsIn);
                     reply.putPerformance(ifIndex, "IfOutOctets", octetsOut);
 
-                    newStatusMap.put(ifIndex, octetsIn);
+                    state.put(ifIndex, octetsIn);
                 }
             }
 
             String replyMsg;
             Status newStatus;
             // Avoid calling reply.setState() if not required.
-            if (state != null) {
-                newStatus = state.computeStatusMaps(
-                        newStatusMap, warningThreshold, criticalThreshold);
+            newStatus = state.computeStatusMaps(
+                    warningThreshold, criticalThreshold);
 
-                if (newStatus.equals(Status.OK)) {
-                    replyMsg = "CheckIfTraffic OK";
-                } else if (newStatus.equals(Status.UNKNOWN)) {
-                    replyMsg = "CheckIfTraffic UNKNOWN. No enough data to set sensible status.";
-                } else if (newStatus.equals(Status.WARNING)) {
-                    replyMsg = "CheckIfTraffic have exceeded WARNING threshold!";
-                } else if (newStatus.equals(Status.CRITICAL)) {
-                    replyMsg = "CheckIfTraffic have exceeded CRITICAL threshold!";
-                } else {
-                    replyMsg = "";
-                }
-                reply.setState(state);
-            } else {
-                newStatus = Status.OK;
+            if (newStatus.equals(Status.OK)) {
                 replyMsg = "CheckIfTraffic OK";
+            } else if (newStatus.equals(Status.UNKNOWN)) {
+                replyMsg = "CheckIfTraffic UNKNOWN. No enough data to set sensible status.";
+            } else if (newStatus.equals(Status.WARNING)) {
+                replyMsg = "CheckIfTraffic have exceeded WARNING threshold!";
+            } else if (newStatus.equals(Status.CRITICAL)) {
+                replyMsg = "CheckIfTraffic have exceeded CRITICAL threshold!";
+            } else {
+                replyMsg = "";
             }
 
+            reply.setState(state);
             reply.setStatus(newStatus);
             reply.setReply(replyMsg);
             return reply;

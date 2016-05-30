@@ -90,7 +90,6 @@ public class CheckIfErrors implements CheckInterface {
             walker.addIndex(index);
         }
 
-        HashMap<Integer, Long> newStatusMap = new HashMap<>();
         try {
 
 
@@ -116,12 +115,12 @@ public class CheckIfErrors implements CheckInterface {
                     reply.putPerformance(ifIndex, "IfInErrors", errsIn);
                     reply.putPerformance(ifIndex, "IfOutErrors", errsOut);
 
-                    newStatusMap.put(ifIndex, errsIn + errsOut);
+                    state.put(ifIndex, errsIn + errsOut);
                 }
             }
 
             Status newStatus = state.computeStatusMaps(
-                    newStatusMap, warningThreshold, criticalThreshold);
+                    warningThreshold, criticalThreshold);
 
             String replyMsg;
             if (newStatus.equals(Status.OK)) {
@@ -143,7 +142,7 @@ public class CheckIfErrors implements CheckInterface {
         } catch (Exception | Error e) {
             CheckIfErrors.logger.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
-            reply.setReply("Error: " + error);
+            reply.setReply("Error: " + error + ". " + e.getMessage());
             return reply;
         }
     }
