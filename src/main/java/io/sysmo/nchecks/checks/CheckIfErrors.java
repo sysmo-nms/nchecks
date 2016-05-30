@@ -24,7 +24,7 @@ package io.sysmo.nchecks.checks;
 import io.sysmo.nchecks.CheckInterface;
 import io.sysmo.nchecks.Query;
 import io.sysmo.nchecks.Reply;
-import io.sysmo.nchecks.snmp.Walker;
+import io.sysmo.nchecks.snmp.TableWalker;
 import io.sysmo.nchecks.states.PerformanceGroupState;
 
 import io.sysmo.nchecks.Status;
@@ -34,7 +34,6 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.TableEvent;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -82,7 +81,7 @@ public class CheckIfErrors implements CheckInterface {
             state = new PerformanceGroupState();
         }
 
-        Walker walker = new Walker();
+        TableWalker walker = new TableWalker();
         walker.addColumn(IF_INDEX);
         walker.addColumn(IF_IN_ERRORS);
         walker.addColumn(IF_OUT_ERRORS);

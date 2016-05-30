@@ -20,7 +20,7 @@ require 'java'
 java_import 'io.sysmo.nchecks.Reply'
 java_import 'io.sysmo.nchecks.Status'
 java_import 'io.sysmo.nchecks.states.PerformanceGroupState'
-java_import 'io.sysmo.nchecks.snmp.Walker'
+java_import 'io.sysmo.nchecks.snmp.TableWalker'
 
 $IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
 $IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
@@ -54,9 +54,9 @@ def check(query) # query is io.sysmo.nchecks.Query
 
 
   #
-  # Inialize SNMP walker
+  # Initialize SNMP walker
   #
-  walker = Walker.new()
+  walker = TableWalker.new()
   walker.addColumn($IF_INDEX)
   walker.addColumn($IF_IN_ERRORS)
   walker.addColumn($IF_OUT_ERRORS)
@@ -91,7 +91,7 @@ def check(query) # query is io.sysmo.nchecks.Query
   end
 
   #
-  # caculcate state and set reply info
+  # Calculate state and set reply info
   #
   new_status = pg_state.computeStatusMaps(
       arg_warning_threshold.asInteger(), arg_critical_threshold.asInteger())

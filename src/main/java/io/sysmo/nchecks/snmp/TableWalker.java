@@ -15,12 +15,12 @@ import java.util.List;
 /**
  * Created by seb on 30/05/16.
  */
-public class Walker
+public class TableWalker
 {
     private List<OID>     columns;
     private List<Integer> indexes;
 
-    public Walker() {
+    public TableWalker() {
         this.columns = new ArrayList<>();
         this.indexes = new ArrayList<>();
     }

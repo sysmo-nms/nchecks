@@ -51,6 +51,14 @@ public class CheckViaJRuby implements CheckInterface
         Reply rep;
         try {
             ScriptingContainer container = new ScriptingContainer();
+            /* TODO better: https://github.com/jruby/jruby/wiki/RedBridgeExamples#Parse_Once_Eval_Many_Times
+                EmbedEvalUnit unit = container.parse(PathType.CLASSPATH, script);
+                then on each script call.
+                See: https://github.com/jruby/jruby/wiki/RedBridge#Context_Instance_Type
+                for concurrency.
+                unit.run()
+             */
+
             Object receiver = container.runScriptlet(script);
             rep = container.callMethod(receiver,"check",query,Reply.class);
         } catch(Exception e) {
@@ -58,7 +66,7 @@ public class CheckViaJRuby implements CheckInterface
             return CheckViaJRuby.handleException(
                     "Script execution failure: " + rbScript, e);
         } catch (Error e) {
-            CheckViaJRuby.logger.error("Jruby exec error");
+            CheckViaJRuby.logger.error("JRuby exec error");
             return CheckViaJRuby.handleError("Script execution failure.");
         }
         return rep;

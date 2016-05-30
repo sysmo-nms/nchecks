@@ -126,6 +126,5 @@ public class NChecksJRuby {
                 return new String(fileBytes, "UTF-8");
             }
         }
-
     }
 }
