@@ -39,8 +39,10 @@ public class Walker
 
     public List<TableEvent> walk(Query query) throws Exception {
 
-        OID[]     columnArray  = (OID[])     this.columns.toArray();
-        Integer[] indexesArray = (Integer[]) this.indexes.toArray();
+        OID[] columnArray = new OID[this.columns.size()];
+        columns.toArray(columnArray);
+        Integer[] indexesArray = new Integer[this.indexes.size()];
+        indexes.toArray(indexesArray);
 
         // sort indexes
         Arrays.sort(indexesArray);

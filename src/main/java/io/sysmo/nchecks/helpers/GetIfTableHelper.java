@@ -101,7 +101,6 @@ public class GetIfTableHelper implements HelperInterface {
 
     public HelperReply callHelper(Query query)
     {
-        // TODO do not list linux interfaces
         try {
             AbstractTarget target = Manager.getTarget(query);
             TableUtils tableWalker = Manager.getTableUtils(PDU.GETNEXT);
