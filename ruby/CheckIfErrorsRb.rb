@@ -38,7 +38,7 @@ def check(query) # query is io.sysmo.nchecks.Query
       arg_critical_threshold = query.get("critical_threshold")
   rescue Exception => e
       reply.setStatus(Status::ERROR);
-      reply.setReply("Missing or wrong argument: " + e.getMessage())
+      reply.setReply("Missing or wrong argument.")
       return reply
   end
 
@@ -46,8 +46,9 @@ def check(query) # query is io.sysmo.nchecks.Query
   #
   # Get the state or create it
   #
+  # WARNING BUG HERE java nullpointerexception
   pg_state = query.getState()
-  if pg_state.nil?
+  if (pg_state == nil)
       pg_state = PerformanceGroupState.new()
   end
 
@@ -59,7 +60,7 @@ def check(query) # query is io.sysmo.nchecks.Query
   walker.addColumn($IF_INDEX)
   walker.addColumn($IF_IN_ERRORS)
   walker.addColumn($IF_OUT_ERRORS)
-  arg_if_selection_list = arg_if_selection.split(",")
+  arg_if_selection_list = arg_if_selection.asString().split(",")
   arg_if_selection_list.each { |index|
       walker.addIndex(index)
   }
@@ -69,12 +70,13 @@ def check(query) # query is io.sysmo.nchecks.Query
   #
   begin
       snmp_reply = walker.walk(query)
-      snmp_reply.each{ |event|
+      snmp_reply.each { |event|
           variable_bindings = event.getColumns()
           interface_index = variable_bindings[0].getVariable().toInt()
 
-          if (arg_if_selection_list.include(Integer.toString(interface_index))
-              errsIn  = variable_bindings[1].getVariable().toLong()
+
+          if arg_if_selection_list.include?(Integer.toString(interface_index))
+              errsIn = variable_bindings[1].getVariable().toLong()
               errsOut = variable_bindings[2].getVariable().toLong()
               reply.putPerformance(interface_index, "IfInErrors",  errsIn)
               reply.putPerformance(interface_index, "IfOutErrors", errsOut)
@@ -84,21 +86,22 @@ def check(query) # query is io.sysmo.nchecks.Query
       }
   rescue Exception => e
       reply.setStatus(Status::ERROR);
-      reply.setReply("SNMP walk failed: " + e.getMessage())
+      reply.setReply("SNMP walk failed." + e)
       return reply
   end
 
   #
   # caculcate state and set reply info
   #
-  new_status = pg_state.computeStatusMap(warning_threshold, critical_threshold)
-  if    newStatus == Status::OK
+  new_status = pg_state.computeStatusMaps(
+      arg_warning_threshold.asInteger(), arg_critical_threshold.asInteger())
+  if    new_status == Status::OK
       reply.setReply("CheckIfErrors OK")
-  elsif newStatus == Status::UNKNOWN
+  elsif new_status == Status::UNKNOWN
       reply.setReply("CheckIfErrors UNKNOWN. No enough data to set sensible status.")
-  elsif newStatus == Status::WARNING
+  elsif new_status == Status::WARNING
       reply.setReply("CheckIfErrors WARNING have found errors!")
-  elsif newStatus == Status::CRITICAL
+  elsif new_status == Status::CRITICAL
       reply.setReply("CheckIfErrors CRITICAL have found errors!")
   end
 
