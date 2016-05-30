@@ -113,7 +113,9 @@ public class GetIfXTableHelper implements HelperInterface {
             TableEvent evt;
 
             HelperTableReply table = new HelperTableReply();
+            int rowCount = 0;
             while (it.hasNext()) {
+                rowCount += 1;
                 evt = it.next();
                 VariableBinding[]   vbs = evt.getColumns();
                 HelperTableRow row = new HelperTableRow();
@@ -124,13 +126,24 @@ public class GetIfXTableHelper implements HelperInterface {
                 row.addItem("ifAlias", vbs[4].getVariable().toString());
                 table.addRow(row);
             }
-            table.setId("SelectNetworkInterfaces");
-            table.setStatus(HelperReply.SUCCESS);
-            table.setMessage("Please select interfaces you want to monitor:");
-            table.setTreeRoot("ifType");
-            table.setSelectColumn("ifIndex");
-            table.setSelectType(HelperTableReply.SELECT_MULTIPLE);
-            table.setListSeparator(",");
+            if (rowCount == 0) {
+                table.setId("SelectNetworkInterfaces");
+                table.setStatus(HelperReply.FAILURE);
+                table.setMessage(
+                        "Unable to get an interfaces list from the host." +
+                        "The cause may be : \n" +
+                        "- a partial implementation of the SNMP protocol, \n" +
+                        "- an access control denied the Sysmo SNMP manager, \n" +
+                        "- the host does not support mib2 ifXtable extensions");
+            } else {
+                table.setId("SelectNetworkInterfaces");
+                table.setStatus(HelperReply.SUCCESS);
+                table.setMessage("Please select interfaces you want to monitor:");
+                table.setTreeRoot("ifType");
+                table.setSelectColumn("ifIndex");
+                table.setSelectType(HelperTableReply.SELECT_MULTIPLE);
+                table.setListSeparator(",");
+            }
             return table;
 
         } catch (Exception|Error e) {

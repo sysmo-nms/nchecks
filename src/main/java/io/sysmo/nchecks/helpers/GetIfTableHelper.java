@@ -101,6 +101,7 @@ public class GetIfTableHelper implements HelperInterface {
 
     public HelperReply callHelper(Query query)
     {
+        // TODO do not list linux interfaces
         try {
             AbstractTarget target = Manager.getTarget(query);
             TableUtils tableWalker = Manager.getTableUtils(PDU.GETNEXT);
@@ -114,6 +115,7 @@ public class GetIfTableHelper implements HelperInterface {
             HelperTableReply table = new HelperTableReply();
             int rowCount = 0;
             while (it.hasNext()) {
+                rowCount += 1;
                 evt = it.next();
                 VariableBinding[]   vbs = evt.getColumns();
                 HelperTableRow row = new HelperTableRow();
@@ -127,7 +129,11 @@ public class GetIfTableHelper implements HelperInterface {
             if (rowCount == 0) {
                 table.setId("SelectNetworkInterfaces");
                 table.setStatus(HelperReply.FAILURE);
-                table.setMessage("Unable to get any interfaces from the host");
+                table.setMessage(
+                        "Unable to get an interfaces list from the host." +
+                        "The cause may be : \n" +
+                        "- a partial implementation of the SNMP protocol, \n" +
+                        "- an access control denied the Sysmo SNMP manager, \n");
             } else {
                 table.setId("SelectNetworkInterfaces");
                 table.setStatus(HelperReply.SUCCESS);
