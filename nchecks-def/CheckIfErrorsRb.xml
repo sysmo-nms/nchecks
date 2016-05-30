@@ -24,7 +24,7 @@
     <Check
         Id="CheckIfErrorsRb"
         Version="1.0"
-        Class="io.sysmo.nchecks.checks.ChecksViaJRuby">
+        Class="io.sysmo.nchecks.checks.CheckViaJRuby">
 
         <Author><![CDATA[Sebastien Serre (ssbx@sysmo.io)]]></Author>
         <AuthorUrl>http://www.sysmo.io</AuthorUrl>
