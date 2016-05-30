@@ -26,7 +26,7 @@ import io.sysmo.nchecks.HelperReply;
 import io.sysmo.nchecks.HelperSimpleReply;
 import io.sysmo.nchecks.HelperTableReply;
 import io.sysmo.nchecks.HelperTableRow;
-import io.sysmo.nchecks.NChecksSNMP;
+import io.sysmo.nchecks.snmp.Manager;
 import io.sysmo.nchecks.Query;
 import org.snmp4j.AbstractTarget;
 import org.snmp4j.PDU;
@@ -103,8 +103,8 @@ public class GetIfXTableHelper implements HelperInterface {
     public HelperReply callHelper(Query query)
     {
         try {
-            AbstractTarget target = NChecksSNMP.getTarget(query);
-            TableUtils tableWalker = NChecksSNMP.getTableUtils(PDU.GETNEXT);
+            AbstractTarget target = Manager.getTarget(query);
+            TableUtils tableWalker = Manager.getTableUtils(PDU.GETNEXT);
 
             List<TableEvent> snmpReply = tableWalker.getTable(
                     target, columns, null, null);

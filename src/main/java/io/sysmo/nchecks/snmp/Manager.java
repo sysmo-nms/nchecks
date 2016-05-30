@@ -19,8 +19,9 @@
  * along with Sysmo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.sysmo.nchecks;
+package io.sysmo.nchecks.snmp;
 
+import io.sysmo.nchecks.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,26 +66,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 // TODO handle snmp v3 usm user modification;
-public class NChecksSNMP
+public class Manager
 {
     private Snmp snmp4jSession = null;
     private TableUtils getNextTableUtils;
     private TableUtils getBulkTableUtils;
     private TableUtils getTableUtils;
     private Map<String, AbstractTarget> agents;
-    private Logger logger = LoggerFactory.getLogger(NChecksSNMP.class);
-    private static NChecksSNMP instance = null;
+    private Logger logger = LoggerFactory.getLogger(Manager.class);
+    private static Manager instance = null;
 
     public static void start(final String etcDir) throws Exception {
-        NChecksSNMP.instance = new NChecksSNMP(etcDir);
+        Manager.instance = new Manager(etcDir);
     }
 
     public static void stop() {
-        if (NChecksSNMP.instance != null) {
-            NChecksSNMP.instance.logger.info("stop");
-            if (NChecksSNMP.instance.snmp4jSession != null) {
+        if (Manager.instance != null) {
+            Manager.instance.logger.info("stop");
+            if (Manager.instance.snmp4jSession != null) {
                 try {
-                    NChecksSNMP.instance.snmp4jSession.close();
+                    Manager.instance.snmp4jSession.close();
                 } catch (IOException e) {
                     // ignore
                 }
@@ -92,7 +93,7 @@ public class NChecksSNMP
         }
     }
 
-    private NChecksSNMP(final String etcDir) throws Exception
+    private Manager(final String etcDir) throws Exception
     {
         try {
             String eidFile = FileSystems
@@ -100,7 +101,7 @@ public class NChecksSNMP
                     .getPath(etcDir, "engine.id")
                     .toString();
 
-            byte[] engineId = NChecksSNMP.getEngineId(eidFile);
+            byte[] engineId = Manager.getEngineId(eidFile);
             UdpTransportMapping transport = new DefaultUdpTransportMapping();
             this.snmp4jSession = new Snmp(transport);
             USM usm = new USM(SecurityProtocols.getInstance(),
@@ -126,24 +127,24 @@ public class NChecksSNMP
     {
         switch (pduType) {
             case PDU.GETNEXT:
-                return NChecksSNMP.instance.getNextTableUtils;
+                return Manager.instance.getNextTableUtils;
             case PDU.GETBULK:
-                return NChecksSNMP.instance.getBulkTableUtils;
+                return Manager.instance.getBulkTableUtils;
             default:
-                return NChecksSNMP.instance.getTableUtils;
+                return Manager.instance.getTableUtils;
         }
     }
 
     public static synchronized void cleanup()
     {
-        NChecksSNMP.instance.snmp4jSession.getUSM().removeAllUsers();
-        NChecksSNMP.instance.agents = new HashMap<>();
+        Manager.instance.snmp4jSession.getUSM().removeAllUsers();
+        Manager.instance.agents = new HashMap<>();
     }
 
     public static synchronized AbstractTarget getTarget(Query query)
             throws Exception
     {
-        return NChecksSNMP.instance.getTargetFor(query);
+        return Manager.instance.getTargetFor(query);
     }
 
     /**
@@ -174,7 +175,7 @@ public class NChecksSNMP
 
         Address address = GenericAddress.parse("udp:" + host + "/" + port);
 
-        int secLevelConst = NChecksSNMP.getSecLevel(secLevel);
+        int secLevelConst = Manager.getSecLevel(secLevel);
 
         switch (version) {
             case "3":
@@ -210,9 +211,9 @@ public class NChecksSNMP
 
         } else {
 
-            OID authProtoOid = NChecksSNMP.getAuthProto(
+            OID authProtoOid = Manager.getAuthProto(
                     query.get("snmp_authproto").asString());
-            OID privProtoOid = NChecksSNMP.getPrivProto(
+            OID privProtoOid = Manager.getPrivProto(
                     query.get("snmp_privproto").asString());
 
             OctetString uName = new OctetString(
@@ -258,12 +259,12 @@ public class NChecksSNMP
 
             byte[] engineIdDump = Files.readAllBytes(path);
             String engineIdHex = new String(engineIdDump, "UTF-8");
-            return NChecksSNMP.hexStringToBytes(engineIdHex); // return engine Id
+            return Manager.hexStringToBytes(engineIdHex); // return engine Id
 
         } else {
 
             byte[] engineId     = MPv3.createLocalEngineID();
-            String engineIdHex  = NChecksSNMP.bytesToHexString(engineId);
+            String engineIdHex  = Manager.bytesToHexString(engineId);
             byte[] engineIdDump = engineIdHex.getBytes("UTF-8");
             Files.write(path, engineIdDump);
             return engineId;

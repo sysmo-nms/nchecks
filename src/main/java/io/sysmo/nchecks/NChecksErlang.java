@@ -33,6 +33,7 @@ import com.ericsson.otp.erlang.OtpErlangString;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.ericsson.otp.erlang.OtpMbox;
 
+import io.sysmo.nchecks.snmp.Manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,7 +120,7 @@ public class NChecksErlang implements Runnable
         NChecksErlang.logger.info("JRuby init with path: " + rubyDir);
 
         // initialize snmpman
-        NChecksSNMP.start(etcDir);
+        Manager.start(etcDir);
         NChecksErlang.logger.info("SNMP started");
 
         // initialize state client
@@ -144,7 +145,7 @@ public class NChecksErlang implements Runnable
         }
         this.threadPool.shutdownNow();
         StateClient.stop();
-        NChecksSNMP.stop();
+        Manager.stop();
         this.mbox.exit("crach");
     }
 
@@ -263,7 +264,7 @@ public class NChecksErlang implements Runnable
                     break;
 
                 case "cleanup":
-                    NChecksSNMP.cleanup();
+                    Manager.cleanup();
                     break;
 
                 default:

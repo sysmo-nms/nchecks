@@ -24,7 +24,7 @@ package io.sysmo.nchecks.checks;
 import io.sysmo.nchecks.CheckInterface;
 import io.sysmo.nchecks.Reply;
 import io.sysmo.nchecks.Query;
-import io.sysmo.nchecks.NChecksSNMP;
+import io.sysmo.nchecks.snmp.Manager;
 
 import io.sysmo.nchecks.Status;
 import org.snmp4j.AbstractTarget;
@@ -106,8 +106,8 @@ public class CheckNetworkInterfaces implements CheckInterface
 
             // TODO try PDU.GETBULK then PDU.GETNEXT to degrade....
             // TODO keep degrade state in reply.setOpaqueData(v)
-            AbstractTarget target = NChecksSNMP.getTarget(query);
-            TableUtils tableWalker = NChecksSNMP.getTableUtils(PDU.GETNEXT);
+            AbstractTarget target = Manager.getTarget(query);
+            TableUtils tableWalker = Manager.getTableUtils(PDU.GETNEXT);
             List<TableEvent> snmpReply = tableWalker.getTable(
                     target, CheckNetworkInterfaces.columns,
                     lowerBoundIndex, upperBoundIndex);
