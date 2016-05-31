@@ -21,6 +21,7 @@ java_import 'io.sysmo.nchecks.Reply'
 java_import 'io.sysmo.nchecks.Status'
 java_import 'io.sysmo.nchecks.states.PerformanceGroupState'
 java_import 'io.sysmo.nchecks.snmp.TableWalker'
+java_import 'java.lang.Integer'
 
 $IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
 $IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
@@ -46,7 +47,6 @@ def check(query) # query is io.sysmo.nchecks.Query
   #
   # Get the state or create it
   #
-  # WARNING BUG HERE java nullpointerexception
   pg_state = query.getState()
   if (pg_state == nil)
       pg_state = PerformanceGroupState.new()
@@ -74,9 +74,8 @@ def check(query) # query is io.sysmo.nchecks.Query
           variable_bindings = event.getColumns()
           interface_index = variable_bindings[0].getVariable().toInt()
 
-
           if arg_if_selection_list.include?(Integer.toString(interface_index))
-              errsIn = variable_bindings[1].getVariable().toLong()
+              errsIn  = variable_bindings[1].getVariable().toLong()
               errsOut = variable_bindings[2].getVariable().toLong()
               reply.putPerformance(interface_index, "IfInErrors",  errsIn)
               reply.putPerformance(interface_index, "IfOutErrors", errsOut)
@@ -86,17 +85,27 @@ def check(query) # query is io.sysmo.nchecks.Query
       }
   rescue Exception => e
       reply.setStatus(Status::ERROR);
-      reply.setReply("SNMP walk failed." + e)
+      reply.setReply("SNMP walk failed." + e.message())
       return reply
   end
 
   #
   # Calculate state and set reply info
   #
-  new_status = pg_state.computeStatusMaps(
-      arg_warning_threshold.asInteger(), arg_critical_threshold.asInteger())
+  new_status = Status::OK
+  #begin
+      warning_limit  = arg_warning_threshold.asInteger()
+      critical_limit = arg_critical_threshold.asInteger()
+
+      # WARNING BUG HERE java nullpointerexception
+      #new_status = pg_state.computeStatusMaps(warning_limit, critical_limit)
+      pg_state.computeStatusMaps(warning_limit, critical_limit)
+      # WARNING END
+  #rescue Exception => e
+      #exep = " warning "
+  #end
   if    new_status == Status::OK
-      reply.setReply("CheckIfErrors OK")
+      reply.setReply("CheckIfErrors OK ")
   elsif new_status == Status::UNKNOWN
       reply.setReply("CheckIfErrors UNKNOWN. No enough data to set sensible status.")
   elsif new_status == Status::WARNING
@@ -105,7 +114,7 @@ def check(query) # query is io.sysmo.nchecks.Query
       reply.setReply("CheckIfErrors CRITICAL have found errors!")
   end
 
-  reply.setState(pg_state)
+  #reply.setState(pg_state)
   reply.setStatus(new_status)
 
   return reply
