@@ -1,6 +1,7 @@
 package io.sysmo.nchecks.states;
 
 import io.sysmo.nchecks.Status;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
