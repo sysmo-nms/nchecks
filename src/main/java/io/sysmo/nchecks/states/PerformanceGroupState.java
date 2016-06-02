@@ -96,10 +96,10 @@ public class PerformanceGroupState implements Serializable {
             Long old = this.olderData.get(key); // nullpointerexception from JRuby only???
             if (old != null) {
                 long diff = (upd - old) / minutes;
-                if (diff > warning) {
+                if (diff > warning && warning >= 1) {
                     newStatus = Status.WARNING;
                 }
-                if (diff > critical) {
+                if (diff > critical && critical >= 1) {
                     newStatus = Status.CRITICAL;
                 }
             }
