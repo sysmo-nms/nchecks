@@ -94,18 +94,18 @@ def check(query) # query is io.sysmo.nchecks.Query
       new_status = pg_state.computeStatusMaps(warning_limit, critical_limit)
 
       if    new_status == Status::OK
-          reply.setReply("CheckIfErrors OK ")
+          reply.setReply("CheckIfTraffic OK ")
       elsif new_status == Status::UNKNOWN
-          reply.setReply("CheckIfErrors UNKNOWN. No enough data to set sensible status.")
+          reply.setReply("CheckIfTraffic UNKNOWN. No enough data to set sensible status.")
       elsif new_status == Status::WARNING
-          reply.setReply("CheckIfErrors WARNING have found errors!")
+          reply.setReply("CheckIfTraffic WARNING have found errors!")
       elsif new_status == Status::CRITICAL
-          reply.setReply("CheckIfErrors CRITICAL have found errors!")
+          reply.setReply("CheckIfTraffic CRITICAL have found errors!")
       end
 
   rescue Exception => e
       new_status = Status::ERROR
-      reply.setReply("CheckIfErrors: #{e.message}")
+      reply.setReply("CheckIfTraffic: #{e.message}")
   end
 
   reply.setState(pg_state)
