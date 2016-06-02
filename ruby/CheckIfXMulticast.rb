@@ -78,7 +78,7 @@ def check(query) # query is io.sysmo.nchecks.Query
           mcOut = variable_bindings[2].getVariable().toLong()
           reply.putPerformance(interface_index, "IfInMulticastPkts", mcIn)
           reply.putPerformance(interface_index, "IfOutMulticastPkts",  mcOut)
-          pg_state.put(interface_index, bcIn + bcOut)
+          pg_state.put(interface_index, mcIn + mcOut)
       end
   }
 

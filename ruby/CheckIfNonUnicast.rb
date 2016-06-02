@@ -78,7 +78,7 @@ def check(query) # query is io.sysmo.nchecks.Query
           nuOut = variable_bindings[2].getVariable().toLong()
           reply.putPerformance(interface_index, "IfInNonUnicast",  nuIn)
           reply.putPerformance(interface_index, "IfOutNonUnicast", nuOut)
-          pg_state.put(interface_index, errsIn + errsOut)
+          pg_state.put(interface_index, nuIn + nuOut)
       end
   }
 

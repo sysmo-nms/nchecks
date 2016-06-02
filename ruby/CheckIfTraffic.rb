@@ -74,11 +74,11 @@ def check(query) # query is io.sysmo.nchecks.Query
       interface_index = variable_bindings[0].getVariable().toInt()
 
       if arg_if_selection_list.include?(Integer.toString(interface_index))
-          errsIn  = variable_bindings[1].getVariable().toLong()
-          errsOut = variable_bindings[2].getVariable().toLong()
-          reply.putPerformance(interface_index, "IfInOctets",  errsIn)
-          reply.putPerformance(interface_index, "IfOutOctets", errsOut)
-          pg_state.put(interface_index, errsIn + errsOut)
+          tIn  = variable_bindings[1].getVariable().toLong()
+          tOut = variable_bindings[2].getVariable().toLong()
+          reply.putPerformance(interface_index, "IfInOctets",  tIn)
+          reply.putPerformance(interface_index, "IfOutOctets", tOut)
+          pg_state.put(interface_index, tIn + tOut)
       end
   }
 
