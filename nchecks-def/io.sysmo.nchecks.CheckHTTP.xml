@@ -23,7 +23,7 @@
 <NChecks xmlns="http://schemas.sysmo.io/2015/NChecks">
 
     <Check
-        Id="CheckHTTP"
+        Id="io.sysmo.nchecks.CheckHTTP"
         Version="1.0"
         Class="io.sysmo.nchecks.checks.CheckViaJRuby">
 
