@@ -23,9 +23,9 @@ java_import 'io.sysmo.nchecks.states.PerformanceGroupState'
 java_import 'io.sysmo.nchecks.snmp.TableWalker'
 java_import 'java.lang.Integer'
 
-$IF_INDEX      = "1.3.6.1.2.1.2.2.1.1";
-$IF_IN_ERRORS  = "1.3.6.1.2.1.2.2.1.14";
-$IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20";
+$IF_INDEX      = "1.3.6.1.2.1.2.2.1.1"
+$IF_IN_ERRORS  = "1.3.6.1.2.1.2.2.1.14"
+$IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20"
 
 def check(query) # query is io.sysmo.nchecks.Query
   reply = Reply.new()
@@ -38,7 +38,7 @@ def check(query) # query is io.sysmo.nchecks.Query
       arg_warning_threshold = query.get("warning_threshold")
       arg_critical_threshold = query.get("critical_threshold")
   rescue Exception => e
-      reply.setStatus(Status::ERROR);
+      reply.setStatus(Status::ERROR)
       reply.setReply("Missing or wrong argument.")
       return reply
   end
