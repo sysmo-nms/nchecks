@@ -36,6 +36,9 @@ public class PerformanceGroupState implements Serializable {
     }
 
     public void put(Integer index, Long value) {
+        if (this.newerData == null) {
+            this.newerData = new HashMap<>();
+        }
         this.newerData.put(index, value);
     }
 
