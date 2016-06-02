@@ -44,6 +44,7 @@ import java.util.List;
 /**
  * Definition of the check is in the file CheckIfNonUnicast.xml
  */
+@Deprecated
 public class CheckIfNonUnicast implements CheckInterface {
     static Logger logger = LoggerFactory.getLogger(CheckIfNonUnicast.class);
     private static String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";

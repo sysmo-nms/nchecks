@@ -22,9 +22,9 @@
 
 <NChecks xmlns="http://schemas.sysmo.io/2015/NChecks">
     <Check
-        Id="CheckIfTraffic"
+        Id="CheckIfTrafficRb"
         Version="1.0"
-        Class="io.sysmo.nchecks.checks.CheckIfTraffic">
+        Class="io.sysmo.nchecks.checks.CheckViaJRuby">
 
         <Author><![CDATA[Sebastien Serre (ssbx@sysmo.io)]]></Author>
         <AuthorUrl>http://www.sysmo.io</AuthorUrl>

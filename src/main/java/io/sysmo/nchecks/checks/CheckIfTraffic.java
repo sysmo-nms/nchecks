@@ -45,6 +45,7 @@ import java.util.List;
 /**
  * Definition of the check is in the file CheckIfTraffic.xml
  */
+@Deprecated
 public class CheckIfTraffic implements CheckInterface
 {
     static Logger logger = LoggerFactory.getLogger(CheckIfTraffic.class);

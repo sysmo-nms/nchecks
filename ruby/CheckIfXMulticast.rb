@@ -23,9 +23,9 @@ java_import 'io.sysmo.nchecks.states.PerformanceGroupState'
 java_import 'io.sysmo.nchecks.snmp.TableWalker'
 java_import 'java.lang.Integer'
 
-$IF_INDEX      = "1.3.6.1.2.1.2.2.1.1";
-$IF_IN_OCTETS  = "1.3.6.1.2.1.2.2.1.10";
-$IF_OUT_OCTETS = "1.3.6.1.2.1.2.2.1.16";
+$IF_INDEX         = "1.3.6.1.2.1.2.2.1.1";
+$IF_IN_MULTICAST  = "1.3.6.1.2.1.31.1.1.1.3";
+$IF_OUT_MULTICAST = "1.3.6.1.2.1.31.1.1.1.4";
 
 def check(query) # query is io.sysmo.nchecks.Query
   reply = Reply.new()
@@ -58,8 +58,8 @@ def check(query) # query is io.sysmo.nchecks.Query
   #
   walker = TableWalker.new()
   walker.addColumn($IF_INDEX)
-  walker.addColumn($IF_IN_OCTETS)
-  walker.addColumn($IF_OUT_OCTETS)
+  walker.addColumn($IF_IN_MULTICAST)
+  walker.addColumn($IF_OUT_MULTICAST)
   arg_if_selection_list = arg_if_selection.asString().split(",")
   arg_if_selection_list.each { |index|
       walker.addIndex(index)
@@ -74,11 +74,11 @@ def check(query) # query is io.sysmo.nchecks.Query
       interface_index = variable_bindings[0].getVariable().toInt()
 
       if arg_if_selection_list.include?(Integer.toString(interface_index))
-          errsIn  = variable_bindings[1].getVariable().toLong()
-          errsOut = variable_bindings[2].getVariable().toLong()
-          reply.putPerformance(interface_index, "IfInErrors",  errsIn)
-          reply.putPerformance(interface_index, "IfOutErrors", errsOut)
-          pg_state.put(interface_index, errsIn + errsOut)
+          mcIn  = variable_bindings[1].getVariable().toLong()
+          mcOut = variable_bindings[2].getVariable().toLong()
+          reply.putPerformance(interface_index, "IfInMulticastPkts", mcIn)
+          reply.putPerformance(interface_index, "IfOutMulticastPkts",  mcOut)
+          pg_state.put(interface_index, bcIn + bcOut)
       end
   }
 
@@ -94,18 +94,18 @@ def check(query) # query is io.sysmo.nchecks.Query
       new_status = pg_state.computeStatusMaps(warning_limit, critical_limit)
 
       if    new_status == Status::OK
-          reply.setReply("CheckIfTraffic OK ")
+          reply.setReply("CheckIfXMulticast OK ")
       elsif new_status == Status::UNKNOWN
-          reply.setReply("CheckIfTraffic UNKNOWN. No enough data to set sensible status.")
+          reply.setReply("CheckIfXMulticast UNKNOWN. No enough data to set sensible status.")
       elsif new_status == Status::WARNING
-          reply.setReply("CheckIfTraffic WARNING have found errors!")
+          reply.setReply("CheckIfXMulticast WARNING have found errors!")
       elsif new_status == Status::CRITICAL
-          reply.setReply("CheckIfTraffic CRITICAL have found errors!")
+          reply.setReply("CheckIfXMulticast CRITICAL have found errors!")
       end
 
   rescue Exception => e
       new_status = Status::ERROR
-      reply.setReply("CheckIfTraffic: #{e.message}")
+      reply.setReply("CheckIfXMulticast: #{e.message}")
   end
 
   reply.setState(pg_state)

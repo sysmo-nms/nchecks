@@ -41,6 +41,7 @@ import java.util.List;
 /**
  * Definition of the check is in the file CheckIfErrors.xml
  */
+@Deprecated
 public class CheckIfErrors implements CheckInterface {
     static Logger logger = LoggerFactory.getLogger(CheckIfErrors.class);
     private static String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";

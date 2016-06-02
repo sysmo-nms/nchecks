@@ -22,15 +22,15 @@
 
 <NChecks xmlns="http://schemas.sysmo.io/2015/NChecks">
     <Check
-        Id="CheckIfErrors"
+        Id="CheckIfErrorsRb"
         Version="1.0"
-        Class="io.sysmo.nchecks.checks.CheckIfErrors">
+        Class="io.sysmo.nchecks.checks.CheckViaJRuby">
 
         <Author><![CDATA[Sebastien Serre (ssbx@sysmo.io)]]></Author>
         <AuthorUrl>http://www.sysmo.io</AuthorUrl>
-        <UpdatesUrl>http://www.sysmo.io/nchecks/updates/CheckIfErrors/</UpdatesUrl>
+        <UpdatesUrl>http://www.sysmo.io/nchecks/updates/CheckIfErrorsRb/</UpdatesUrl>
 
-        <Description>CheckIfErrors raise a CRITICAL or WARNING alert if interfaces errors exceed thresholds.</Description>
+        <Description>CheckIfErrorsRb raise a CRITICAL or WARNING alert if interfaces errors exceed thresholds.</Description>
         <Overview> </Overview>
 
         <Require Ressource="snmp" />

@@ -44,6 +44,7 @@ import java.util.List;
 /**
  * Definition of the check is in the file CheckIfXMulticast.xml
  */
+@Deprecated
 public class CheckIfXMulticast implements CheckInterface
 {
     static Logger logger = LoggerFactory.getLogger(CheckIfXMulticast.class);

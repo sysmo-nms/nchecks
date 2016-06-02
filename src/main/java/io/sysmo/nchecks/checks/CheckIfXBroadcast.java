@@ -44,6 +44,7 @@ import java.util.List;
 /**
  * Definition of the check is in the file CheckIfXBroadcast.xml
  */
+@Deprecated
 public class CheckIfXBroadcast implements CheckInterface
 {
     static Logger logger = LoggerFactory.getLogger(CheckIfXBroadcast.class);
