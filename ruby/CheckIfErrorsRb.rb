@@ -23,12 +23,12 @@ java_import 'io.sysmo.nchecks.states.PerformanceGroupState'
 java_import 'io.sysmo.nchecks.snmp.TableWalker'
 java_import 'java.lang.Integer'
 
-$IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
-$IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
+$IF_INDEX      = "1.3.6.1.2.1.2.2.1.1";
+$IF_IN_ERRORS  = "1.3.6.1.2.1.2.2.1.14";
 $IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20";
 
 def check(query) # query is io.sysmo.nchecks.Query
-    reply = Reply.new()
+  reply = Reply.new()
 
   #
   # get arguments: if_selection, warning_threshold, critical_threshold
@@ -68,53 +68,47 @@ def check(query) # query is io.sysmo.nchecks.Query
   #
   # Walk the target and fill PerformanceGroupState and reply
   #
-  begin
-      snmp_reply = walker.walk(query)
-      snmp_reply.each { |event|
-          variable_bindings = event.getColumns()
-          interface_index = variable_bindings[0].getVariable().toInt()
+  snmp_reply = walker.walk(query)
+  snmp_reply.each { |event|
+      variable_bindings = event.getColumns()
+      interface_index = variable_bindings[0].getVariable().toInt()
 
-          if arg_if_selection_list.include?(Integer.toString(interface_index))
-              errsIn  = variable_bindings[1].getVariable().toLong()
-              errsOut = variable_bindings[2].getVariable().toLong()
-              reply.putPerformance(interface_index, "IfInErrors",  errsIn)
-              reply.putPerformance(interface_index, "IfOutErrors", errsOut)
-              pg_state.put(interface_index, errsIn + errsOut)
-          end
+      if arg_if_selection_list.include?(Integer.toString(interface_index))
+          errsIn  = variable_bindings[1].getVariable().toLong()
+          errsOut = variable_bindings[2].getVariable().toLong()
+          reply.putPerformance(interface_index, "IfInErrors",  errsIn)
+          reply.putPerformance(interface_index, "IfOutErrors", errsOut)
+          pg_state.put(interface_index, errsIn + errsOut)
+      end
+  }
 
-      }
-  rescue Exception => e
-      reply.setStatus(Status::ERROR);
-      reply.setReply("SNMP walk failed." + e.message())
-      return reply
-  end
 
   #
   # Calculate state and set reply info
   #
   new_status = Status::OK
-  #begin
+  begin
+
       warning_limit  = arg_warning_threshold.asInteger()
       critical_limit = arg_critical_threshold.asInteger()
+      new_status = pg_state.computeStatusMaps(warning_limit, critical_limit)
 
-      # WARNING BUG HERE java nullpointerexception
-      #new_status = pg_state.computeStatusMaps(warning_limit, critical_limit)
-      pg_state.computeStatusMaps(warning_limit, critical_limit)
-      # WARNING END
-  #rescue Exception => e
-      #exep = " warning "
-  #end
-  if    new_status == Status::OK
-      reply.setReply("CheckIfErrors OK ")
-  elsif new_status == Status::UNKNOWN
-      reply.setReply("CheckIfErrors UNKNOWN. No enough data to set sensible status.")
-  elsif new_status == Status::WARNING
-      reply.setReply("CheckIfErrors WARNING have found errors!")
-  elsif new_status == Status::CRITICAL
-      reply.setReply("CheckIfErrors CRITICAL have found errors!")
+      if    new_status == Status::OK
+          reply.setReply("CheckIfErrors OK ")
+      elsif new_status == Status::UNKNOWN
+          reply.setReply("CheckIfErrors UNKNOWN. No enough data to set sensible status.")
+      elsif new_status == Status::WARNING
+          reply.setReply("CheckIfErrors WARNING have found errors!")
+      elsif new_status == Status::CRITICAL
+          reply.setReply("CheckIfErrors CRITICAL have found errors!")
+      end
+
+  rescue Exception => e
+      new_status = Status::ERROR
+      reply.setReply("CheckIfErrors: #{e.message}")
   end
 
-  #reply.setState(pg_state)
+  reply.setState(pg_state)
   reply.setStatus(new_status)
 
   return reply
