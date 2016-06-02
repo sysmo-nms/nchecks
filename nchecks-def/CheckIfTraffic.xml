@@ -22,7 +22,7 @@
 
 <NChecks xmlns="http://schemas.sysmo.io/2015/NChecks">
     <Check
-        Id="CheckIfTrafficRb"
+        Id="CheckIfTraffic"
         Version="1.0"
         Class="io.sysmo.nchecks.checks.CheckViaJRuby">
 
