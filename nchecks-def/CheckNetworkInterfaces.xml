@@ -132,7 +132,7 @@
                     <Draw
                         Type="stack"
                         DataSource="IfOutNucastPkts"
-                        Calculation="0,IfOutUcastPkts,-"
+                        Calculation="0,IfOutNucastPkts,-"
                         Consolidation="MAX"
                         Color="#e9b96eff" >
                         Non Unicast packets Out
