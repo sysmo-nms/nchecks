@@ -1,5 +1,0 @@
-Sysmo NMS NChecks
-Copyright 2015 Sysmo NMS
-
-This product includes software developed at
-Sysmo NMS (http://www.sysmo.io/).
