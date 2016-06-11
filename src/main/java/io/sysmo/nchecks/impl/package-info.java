@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sysmo.nchecks;
 
-public interface HelperInterface
-{
-    HelperReply callHelper(Query query);
-}
+/**
+ *
+ * Implementations examples of the nchecks library.
+ *
+ */
+package io.sysmo.nchecks.impl;
