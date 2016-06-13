@@ -28,48 +28,72 @@ import org.slf4j.Logger;
 
 public class CheckViaJRuby implements CheckInterface
 {
+
     private static Logger logger = LoggerFactory.getLogger(CheckViaJRuby.class);
+
 
     public Reply execute(Query query)
     {
+
+        // try to get the ScriptingContainer of the script
         String rbScript = "undefined";
-        ScriptingContainer container;
+        ScriptingContainer script;
         try {
+
             rbScript = query.get("check_id").asString();
-            container = NChecksJRuby.getScript(rbScript);
+            script = NChecksJRuby.getScript(rbScript);
+
         } catch (Exception e) {
+
             CheckViaJRuby.logger.error(e.getMessage(), e);
             return CheckViaJRuby.handleException(
                     "Script not found: " + rbScript, e);
+
         }
 
+
+        // try to call it
         Reply rep;
         try {
-            rep = container.callMethod(null, "check", query, Reply.class);
+
+            rep = script.callMethod(null, "check", query, Reply.class);
+            return rep;
+
         } catch(Exception e) {
+
             CheckViaJRuby.logger.error(e.getMessage(), e);
             return CheckViaJRuby.handleException(
                     "Script execution failure: " + rbScript, e);
+
         } catch (Error e) {
+
             CheckViaJRuby.logger.error("JRuby exec error");
             return CheckViaJRuby.handleError("Script execution failure.");
+
         }
-        return rep;
     }
 
-    private static Reply handleException(String txt, Exception e) {
-        String msg = e.getMessage();
+    private static Reply handleException(String txt, Exception e)
+    {
+
         CheckViaJRuby.logger.error(e.getMessage(), e);
+
         Reply reply = new Reply();
         reply.setStatus(Status.ERROR);
-        reply.setReply("CheckViaJRuby ERROR: " + txt + msg);
+        reply.setReply("CheckViaJRuby ERROR: " + txt + e.getMessage());
+
         return reply;
+
     }
 
-    private static Reply handleError(String txt) {
+    private static Reply handleError(String txt)
+    {
+
         Reply reply = new Reply();
         reply.setStatus(Status.ERROR);
         reply.setReply("CheckViaJRuby ERROR: " + txt);
+
         return reply;
+
     }
 }

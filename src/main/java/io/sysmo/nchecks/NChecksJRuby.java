@@ -27,30 +27,44 @@ import org.jruby.embed.ScriptingContainer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-public class NChecksJRuby {
+
+public class NChecksJRuby
+{
+
     private JRubyCache cache;
     private static NChecksJRuby instance = null;
 
-    public static void startJRubyCache(String scriptPath, String etcDir) {
-        if (NChecksJRuby.instance == null) {
+
+    public static void startJRubyCache(String scriptPath, String etcDir)
+    {
+
+        if (NChecksJRuby.instance == null)
             NChecksJRuby.instance = new NChecksJRuby(scriptPath, etcDir);
-        }
+
     }
 
-    private NChecksJRuby(String scriptPath, String etcDir) {
+
+    private NChecksJRuby(String scriptPath, String etcDir)
+    {
+
         Logger logger = LoggerFactory.getLogger(NChecksJRuby.class);
         String nchecksConf = Paths.get(etcDir, "nchecks.properties").toString();
         Boolean should_cache;
         InputStream input = null;
         try {
+
             Properties props = new Properties();
             input = new FileInputStream(nchecksConf);
             props.load(input);
             should_cache = props.getProperty("cache_ruby_files").equals("true");
+
         } catch (IOException e) {
+
             // no config file found
             should_cache = true;
+
         } finally {
+
             if (input != null) {
                 try {
                     input.close();
@@ -58,72 +72,97 @@ public class NChecksJRuby {
                     // ignore
                 }
             }
+
         }
 
-        if (should_cache) {
+
+        if (should_cache)
             this.cache = new StandardCache(scriptPath);
-        } else {
+        else
             this.cache = new NoCache(scriptPath);
-        }
+
+
         logger.info("JRuby script path: " + scriptPath);
         logger.info("JRuby cache files: " + should_cache.toString());
+
     }
 
-    public static ScriptingContainer getScript(String identifier) throws Exception {
+
+    public static ScriptingContainer getScript(String identifier) throws Exception
+    {
         return NChecksJRuby.instance.cache.getScript(identifier);
     }
+
 
     interface JRubyCache {
         ScriptingContainer getScript(String identifier) throws Exception;
     }
 
-    static class StandardCache implements JRubyCache
+
+    private static class StandardCache implements JRubyCache
     {
         private String scriptPath;
         private HashMap<String,ScriptingContainer> scriptMap;
         private final Object lock = new Object();
 
-        StandardCache(String scriptPath) {
+
+        StandardCache(String scriptPath)
+        {
             this.scriptPath = scriptPath;
             this.scriptMap = new HashMap<>();
         }
 
-        public ScriptingContainer getScript(String identifier) throws Exception {
+
+        public ScriptingContainer getScript(String identifier) throws Exception
+        {
+
             synchronized (this.lock) {
 
                 ScriptingContainer container = this.scriptMap.get(identifier);
-
                 if (container == null) {
+
                     String script = identifier + ".rb";
+                    String scriptFullPath = Paths.get(this.scriptPath, script).toString();
                     container = new ScriptingContainer();
-                    container.runScriptlet(PathType.ABSOLUTE,
-                            Paths.get(scriptPath,script).toString());
+                    container.runScriptlet(PathType.ABSOLUTE, scriptFullPath);
 
                     this.scriptMap.put(script, container);
+
                 }
 
                 return container;
             }
+
         }
     }
 
-    static class NoCache implements JRubyCache
+    private static class NoCache implements JRubyCache
     {
+
         private String scriptPath;
         private final Object lock = new Object();
 
-        NoCache(String scriptPath) {
+
+        NoCache(String scriptPath)
+        {
             this.scriptPath = scriptPath;
         }
 
-        public ScriptingContainer getScript(String identifier) throws Exception {
+
+        public ScriptingContainer getScript(String identifier) throws Exception
+        {
+
             synchronized (this.lock) {
+
                 String script = identifier + ".rb";
+                String scriptFullPath = Paths.get(this.scriptPath, script).toString();
                 ScriptingContainer container = new ScriptingContainer();
-                container.runScriptlet(PathType.ABSOLUTE,
-                        Paths.get(scriptPath,script).toString());
+                container.runScriptlet(PathType.ABSOLUTE, scriptFullPath);
+
                 return container;
+
             }
+
         }
     }
 }

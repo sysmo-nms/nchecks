@@ -14,7 +14,7 @@ archivesBaseName = "nchecks"
  * version = "X.X.X"          -> a new release
  * version = "X.X.X-SNAPSHOT" -> a new snapshot
  */
-version = "0.10.1-SNAPSHOT"
+version = "0.10.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
