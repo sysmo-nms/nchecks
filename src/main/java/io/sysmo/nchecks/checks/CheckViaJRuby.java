@@ -33,10 +33,10 @@ public class CheckViaJRuby implements CheckInterface
     public Reply execute(Query query)
     {
         String rbScript = "undefined";
-        String script;
+        ScriptingContainer container;
         try {
             rbScript = query.get("check_id").asString();
-            script = NChecksJRuby.getScript(rbScript);
+            container = NChecksJRuby.getScript(rbScript);
         } catch (Exception e) {
             CheckViaJRuby.logger.error(e.getMessage(), e);
             return CheckViaJRuby.handleException(
@@ -45,16 +45,7 @@ public class CheckViaJRuby implements CheckInterface
 
         Reply rep;
         try {
-            ScriptingContainer container = new ScriptingContainer();
-            /* TODO better: https://github.com/jruby/jruby/wiki/RedBridgeExamples#Parse_Once_Eval_Many_Times
-               EmbedEvalUnit unit = container.parse(PathType.CLASSPATH, script);
-               then on each script call unit.run().
-
-               See: https://github.com/jruby/jruby/wiki/RedBridge#Context_Instance_Type
-               for concurrency.*/
-
-            Object receiver = container.runScriptlet(script);
-            rep = container.callMethod(receiver,"check",query,Reply.class);
+            rep = container.callMethod(null, "check", query, Reply.class);
         } catch(Exception e) {
             CheckViaJRuby.logger.error(e.getMessage(), e);
             return CheckViaJRuby.handleException(

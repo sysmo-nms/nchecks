@@ -18,11 +18,12 @@ package io.sysmo.nchecks;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.jruby.embed.PathType;
+import org.jruby.embed.ScriptingContainer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -68,18 +69,18 @@ public class NChecksJRuby {
         logger.info("JRuby cache files: " + should_cache.toString());
     }
 
-    public static String getScript(String identifier) throws Exception {
+    public static ScriptingContainer getScript(String identifier) throws Exception {
         return NChecksJRuby.instance.cache.getScript(identifier);
     }
 
     interface JRubyCache {
-        String getScript(String identifier) throws Exception;
+        ScriptingContainer getScript(String identifier) throws Exception;
     }
 
     static class StandardCache implements JRubyCache
     {
         private String scriptPath;
-        private HashMap<String,String> scriptMap;
+        private HashMap<String,ScriptingContainer> scriptMap;
         private final Object lock = new Object();
 
         StandardCache(String scriptPath) {
@@ -87,20 +88,21 @@ public class NChecksJRuby {
             this.scriptMap = new HashMap<>();
         }
 
-        public String getScript(String identifier) throws Exception {
+        public ScriptingContainer getScript(String identifier) throws Exception {
             synchronized (this.lock) {
 
-                String val = this.scriptMap.get(identifier);
+                ScriptingContainer container = this.scriptMap.get(identifier);
 
-                if (val == null) {
+                if (container == null) {
                     String script = identifier + ".rb";
-                    byte[] fileBytes =
-                            Files.readAllBytes(Paths.get(scriptPath,script));
-                    val = new String(fileBytes, "UTF-8");
-                    this.scriptMap.put(script, val);
+                    container = new ScriptingContainer();
+                    container.runScriptlet(PathType.ABSOLUTE,
+                            Paths.get(scriptPath,script).toString());
+
+                    this.scriptMap.put(script, container);
                 }
 
-                return val;
+                return container;
             }
         }
     }
@@ -114,11 +116,13 @@ public class NChecksJRuby {
             this.scriptPath = scriptPath;
         }
 
-        public String getScript(String identifier) throws Exception {
+        public ScriptingContainer getScript(String identifier) throws Exception {
             synchronized (this.lock) {
                 String script = identifier + ".rb";
-                byte[] fileBytes = Files.readAllBytes(Paths.get(scriptPath, script));
-                return new String(fileBytes, "UTF-8");
+                ScriptingContainer container = new ScriptingContainer();
+                container.runScriptlet(PathType.ABSOLUTE,
+                        Paths.get(scriptPath,script).toString());
+                return container;
             }
         }
     }
