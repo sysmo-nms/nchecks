@@ -75,7 +75,7 @@ public class Status implements Comparable<Status>, Serializable {
         return (status.getWeight() == this.getWeight());
     }
 
-    public int getWeight() {
+    private int getWeight() {
         return this.weight;
     }
 

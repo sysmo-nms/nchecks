@@ -27,16 +27,16 @@ public class HelperTableRow
         items = new ArrayList<>();
     }
 
-    /*
-    * Add the string value "value" to the column "column".
-    */
+    /**
+     * Add the string value "value" to the column "column".
+     */
     public void addItem(String column, String value) {
         items.add(new HelperTableItem(column, value));
     }
 
-    /*
-    * Return the list of HelperTableItem for the row.
-    */
+    /**
+     * Return the list of HelperTableItem for the row.
+     */
     public List<HelperTableItem> getItems() {
         return items;
     }

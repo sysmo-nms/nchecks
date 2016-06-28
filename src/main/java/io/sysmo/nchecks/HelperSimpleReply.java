@@ -21,12 +21,15 @@ import javax.json.Json;
 import javax.json.JsonWriter;
 import javax.json.JsonObjectBuilder;
 
-/*
-* This class build a simple message for client view. It will pop up
-* with an icon corresponding to the status, and the message defined.
-* It will fill the flag as defined in the xml check definition file
-* to "value". See tutorials on Nchecks Helpers xml for more informations
-*/
+/**
+ * This class build a simple message for client view. It will pop up
+ * with an icon corresponding to the status, and the message defined.
+ * It will fill the flag as defined in the xml check definition file
+ * to "value". See tutorials on Nchecks Helpers xml for more info.
+ *
+ * @see io.sysmo.nchecks.HelperReply
+ * @see io.sysmo.nchecks.HelperInterface
+ */
 
 public class HelperSimpleReply implements HelperReply
 {
@@ -38,28 +41,31 @@ public class HelperSimpleReply implements HelperReply
 
     public HelperSimpleReply() {}
 
-    /*
-    * Set the identifier of the reply
-    */
+    /**
+     * Set the identifier of the reply.
+     * @param val the identifier string
+     */
     public void setId(String val)  { this.messageId = val; }
 
-    /* set the status of the reply. Must be HelperReply.SUCCESS or
-    * HelperReply.FAILURE.
-    */
+    /** set the status of the reply.
+     * @param val Must be HelperReply.SUCCESS or HelperReply.FAILURE.
+     */
     public void setStatus(String val) { this.status = val; }
 
-    /*
-    * Set the message string show to the user.
-    */
+    /**
+     * Set the message string show to the user.
+     * @param val the informative message string
+     */
     public void setMessage(String val) { this.message = val; }
 
-    /*
-    * Set the value for the target flag.
-    */
+    /**
+     * Set the value for the target flag.
+     */
     public void setValue(String val) { this.value = val; }
 
-    /*
+    /**
      * Build a json representation of the message.
+     * @return a json encoded char array
      */
     public char[] toCharArray()
     {

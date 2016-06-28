@@ -16,10 +16,10 @@
 
 package io.sysmo.nchecks;
 
-public class HelperTableItem
+class HelperTableItem
 {
-    public String key;
-    public String val;
+    private String key;
+    private String val;
     public HelperTableItem(String key, String val) {
         this.key = key;
         this.val = val;

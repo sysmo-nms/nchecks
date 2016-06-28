@@ -41,7 +41,7 @@ public class PerformanceGroupState implements Serializable {
     private Date time;
     private HashMap<Integer, Long> olderData;
     private HashMap<Integer, Long> newerData;
-    static Logger logger = LoggerFactory.getLogger(PerformanceGroupState.class);
+    private static Logger logger = LoggerFactory.getLogger(PerformanceGroupState.class);
 
     public PerformanceGroupState() {
         this.time      = null;
