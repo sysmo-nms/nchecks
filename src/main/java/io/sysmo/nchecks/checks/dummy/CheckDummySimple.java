@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sysmo.nchecks.checks;
+package io.sysmo.nchecks.checks.dummy;
 
 import io.sysmo.nchecks.CheckInterface;
 import io.sysmo.nchecks.Query;
 import io.sysmo.nchecks.Reply;
 import io.sysmo.nchecks.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
@@ -33,22 +35,22 @@ import java.util.Random;
 
 public class CheckDummySimple implements CheckInterface {
 
+    static Logger logger = LoggerFactory.getLogger(CheckDummySimple.class);
+    private static Random randomGenerator = new Random();
     public CheckDummySimple() {}
 
     public Reply execute(Query query) {
 
-        Random generator = new Random();
-        int random = generator.nextInt(5);
 
         Reply reply = new Reply();
         reply.setReply("Dummy reply");
-
+        int random = randomGenerator.nextInt() % 4;
+        CheckDummySimple.logger.info("Random: " + Integer.toString(random));
         switch (random) {
-            case 0:  reply.setStatus(Status.OK);
-            case 1:  reply.setStatus(Status.WARNING);
-            case 2:  reply.setStatus(Status.CRITICAL);
-            case 3:  reply.setStatus(Status.ERROR);
-            default: reply.setStatus(Status.ERROR);
+            case 0:  reply.setStatus(Status.WARNING);
+            case 1:  reply.setStatus(Status.CRITICAL);
+            case 2:  reply.setStatus(Status.ERROR);
+            default: reply.setStatus(Status.OK);
         }
 
         return reply;
