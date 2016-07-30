@@ -37,20 +37,20 @@ public class CheckDummySimple implements CheckInterface {
 
     static Logger logger = LoggerFactory.getLogger(CheckDummySimple.class);
     private static Random randomGenerator = new Random();
+
     public CheckDummySimple() {}
 
     public Reply execute(Query query) {
 
 
         Reply reply = new Reply();
-        reply.setReply("Dummy reply");
-        int random = randomGenerator.nextInt() % 4;
-        CheckDummySimple.logger.info("Random: " + Integer.toString(random));
+        int random = randomGenerator.nextInt(4);
+        reply.setReply("Dummy reply with status: " + Integer.toString(random));
         switch (random) {
-            case 0:  reply.setStatus(Status.WARNING);
-            case 1:  reply.setStatus(Status.CRITICAL);
-            case 2:  reply.setStatus(Status.ERROR);
-            default: reply.setStatus(Status.OK);
+            case 0:  reply.setStatus(Status.WARNING); break;
+            case 1:  reply.setStatus(Status.CRITICAL); break;
+            case 2:  reply.setStatus(Status.ERROR); break;
+            default: reply.setStatus(Status.OK); break;
         }
 
         return reply;
