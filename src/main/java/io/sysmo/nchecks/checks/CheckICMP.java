@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class CheckICMP implements CheckInterface
 {
-    static Logger logger = LoggerFactory.getLogger(CheckICMP.class);
+    private static Logger logger = LoggerFactory.getLogger(CheckICMP.class);
 
     private String  host        = "";
     private int     pktsNumber  = 5;
@@ -241,13 +241,13 @@ public class CheckICMP implements CheckInterface
     }
 
     // utility classes
-    static class StreamConsumer extends Thread {
+    static private class StreamConsumer extends Thread {
         private InputStream     is;
         private String          type;
         private StringBuffer    replyString;
         private CheckICMP       parent;
 
-        public StreamConsumer(
+        StreamConsumer(
                 InputStream inputStream,
                 String      type,
                 CheckICMP   parent)

@@ -32,17 +32,15 @@ import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Definition of the check is in the file CheckIfXBroadcast.xml
  */
-@Deprecated
 public class CheckIfXBroadcast implements CheckInterface
 {
-    static Logger logger = LoggerFactory.getLogger(CheckIfXBroadcast.class);
+    private static Logger logger = LoggerFactory.getLogger(CheckIfXBroadcast.class);
     private static String IF_INDEX         = "1.3.6.1.2.1.2.2.1.1";
     private static String IF_IN_BROADCAST  = "1.3.6.1.2.1.31.1.1.1.3";
     private static String IF_OUT_BROADCAST = "1.3.6.1.2.1.31.1.1.1.5";

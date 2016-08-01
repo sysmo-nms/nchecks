@@ -32,16 +32,14 @@ import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Definition of the check is in the file CheckIfNonUnicast.xml
  */
-@Deprecated
 public class CheckIfNonUnicast implements CheckInterface {
-    static Logger logger = LoggerFactory.getLogger(CheckIfNonUnicast.class);
+    private static Logger logger = LoggerFactory.getLogger(CheckIfNonUnicast.class);
     private static String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
     private static String IF_IN_NON_UNICAST = "1.3.6.1.2.1.2.2.1.12";
     private static String IF_OUT_NON_UNICAST = "1.3.6.1.2.1.2.2.1.18";

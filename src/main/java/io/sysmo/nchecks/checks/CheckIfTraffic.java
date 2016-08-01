@@ -33,17 +33,15 @@ import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Definition of the check is in the file CheckIfTraffic.xml
  */
-@Deprecated
 public class CheckIfTraffic implements CheckInterface
 {
-    static Logger logger = LoggerFactory.getLogger(CheckIfTraffic.class);
+    private static Logger logger = LoggerFactory.getLogger(CheckIfTraffic.class);
     private static String IF_INDEX      = "1.3.6.1.2.1.2.2.1.1";
     private static String IF_IN_OCTETS  = "1.3.6.1.2.1.2.2.1.10";
     private static String IF_OUT_OCTETS = "1.3.6.1.2.1.2.2.1.16";

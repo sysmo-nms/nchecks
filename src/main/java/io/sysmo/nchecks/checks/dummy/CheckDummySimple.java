@@ -35,7 +35,7 @@ import java.util.Random;
 
 public class CheckDummySimple implements CheckInterface {
 
-    static Logger logger = LoggerFactory.getLogger(CheckDummySimple.class);
+    private static Logger logger = LoggerFactory.getLogger(CheckDummySimple.class);
     private static Random randomGenerator = new Random();
 
     public CheckDummySimple() {}
