@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2015-2016 Sebastien Serre <ssbx@sysmo.io>
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<NChecks xmlns="http://schemas.sysmo.io/2015/NChecks">
+    <Check
+        Id="io.sysmo.nchecks.CheckIfXMulticast"
+        Version="1.0"
+        Class="io.sysmo.nchecks.checks.CheckIfXMulticast">
+
+        <Author><![CDATA[Sebastien Serre (ssbx@sysmo.io)]]></Author>
+        <AuthorUrl>http://www.sysmo.io</AuthorUrl>
+        <UpdatesUrl>http://www.sysmo.io/nchecks/updates/CheckIfXMulticast/</UpdatesUrl>
+
+        <Description>CheckIfXMulticast raise a CRITICAL or WARNING alert if interfaces multicast packets reveived and emited exceed thresholds.</Description>
+        <Overview> </Overview>
+
+        <Require Ressource="snmp" />
+
+        <FlagTable>
+            <Flag Id="if_selection">
+                <Hint>A comma separated list of interfaces indexes.</Hint>
+                <Usage>Comma separated list of integers representing snmp interface indexes</Usage>
+                <Helper Descr="Select from if X table"
+                    Class="io.sysmo.nchecks.helpers.GetIfXTableHelper" />
+            </Flag>
+            <Flag Id="warning_threshold">
+                <Hint>Integer representing an average number of broadcast packets per minute.</Hint>
+                <Usage>Set the probe to WARNING state if one interface has more thant "warning_threshold" packets emited and received per minute.</Usage>
+                <Default>100</Default>
+            </Flag>
+            <Flag Id="critical_threshold">
+                <Hint>Integer representing an average number of broadcast packets per minute.</Hint>
+                <Usage>Set the probe to CRITICAL state if one interface has more thant "critical_threshold" packets emited and received per minute.</Usage>
+                <Default>1000</Default>
+            </Flag>
+        </FlagTable>
+
+
+        <Performances Type="table">
+
+            <FlagSource Name="if_selection"/>
+            <FlagSeparator>,</FlagSeparator>
+
+            <FilePrefix>ifIndex</FilePrefix>
+            <FileSuffix>.rrd</FileSuffix>
+
+
+            <!-- PropertyPrefix PropertySuffix
+            if present, the client will take the
+            ${prefix="ifIndex"}${"if_selection[x]"}${suffix=""} from the target -->
+            <PropertyPrefix>ifIndex</PropertyPrefix>
+            <PropertySuffix>-ifName</PropertySuffix>
+
+
+            <DataSourceTable>
+                <DataSource Id="IfInMulticastPkts"  Type="COUNTER" />
+                <DataSource Id="IfOutMulticastPkts" Type="COUNTER" />
+            </DataSourceTable>
+            <GraphTable>
+                <Graph
+                    Id="MulticastInOut"
+                    Rigid="false"
+                    Base="1000"
+                    Unit=""
+                    UnitExponent="" >
+                    <Title>Multicast pkts In/Out</Title>
+                    <VerticalLabel>Packet/Second</VerticalLabel>
+                    <Draw
+                        Type="area"
+                        DataSource="IfInMulticastPkts"
+                        Consolidation="MAX"
+                        Color="#ea644Aff" />
+                     <Draw
+                        Type="area"
+                        DataSource="IfOutMulticastPkts"
+                        Calculation="0,IfOutMulticastPkts,-"
+                        Consolidation="MAX"
+                        Color="#ecd748ff" />
+                    <Draw
+                        Type="line"
+                        DataSource="IfInMulticastPkts"
+                        Consolidation="MAX"
+                        Color="#cc3118ff" >
+                        Multicast packets in
+                    </Draw>
+                    <Draw
+                        Type="line"
+                        DataSource="IfOutMulticastPkts"
+                        Calculation="0,IfOutMulticastPkts,-"
+                        Consolidation="MAX"
+                        Color="#c9b215ff" >
+                        Multicast packets out
+                    </Draw>
+                </Graph>
+            </GraphTable>
+        </Performances>
+    </Check>
+</NChecks>

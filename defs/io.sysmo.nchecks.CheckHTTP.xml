@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2015-2016 Sebastien Serre <ssbx@sysmo.io>
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<NChecks xmlns="http://schemas.sysmo.io/2015/NChecks">
+
+    <Check
+        Id="io.sysmo.nchecks.CheckHTTP"
+        Version="1.0"
+        Class="io.sysmo.nchecks.checks.CheckViaJRuby">
+
+        <Author><![CDATA[Sebastien Serre (ssbx@sysmo.io)]]></Author>
+        <AuthorUrl>http://www.sysmo.io</AuthorUrl>
+        <UpdatesUrl>http://www.sysmo.io/nchecks/updates/CheckHTTP/</UpdatesUrl>
+
+        <Description>Check HTTP service availability on the specified host.</Description>
+        <Overview></Overview>
+
+
+        <FlagTable>
+          <!-- If Default is inexistant, the flag is mandatory -->
+            <Flag Id="uri">
+                <Hint>URI ex: "http://myhost.com:80/get?s=value"</Hint>
+                <Usage>Get this URI. Will return CRITICAL if the return is not 2**.</Usage>
+            </Flag>
+        </FlagTable>
+
+
+        <Performances Type="simple">
+            <FileName>CheckHTTP.rrd</FileName>
+            <DataSourceTable>
+                <DataSource Id="ReplyDuration" Type="GAUGE" />
+            </DataSourceTable>
+            <GraphTable>
+                <Graph
+                    Id="HTTPLatency"
+                    Minimum="0"
+                    Maximum=""
+                    Rigid="false"
+                    Base="1000"
+                    Unit="ms"
+                    UnitExponent="0" >
+                    <Title>HTTP Performances</Title>
+                    <VerticalLabel>Milliseconds</VerticalLabel>
+                    <Draw
+                        Type="area"
+                        DataSource="ReplyDuration"
+                        Consolidation="MAX"
+                        Color="#48c4ecff" />
+                    <Draw
+                        Type="area"
+                        DataSource="ReplyDuration"
+                        Consolidation="AVERAGE"
+                        Color="#de48edff" />
+                    <Draw
+                        Type="area"
+                        DataSource="ReplyDuration"
+                        Consolidation="MIN"
+                        Color="#7648edff" />
+                    <Draw
+                        Type="line"
+                        DataSource="ReplyDuration"
+                        Consolidation="MAX"
+                        Color="#1598c3ff" >
+                        Maximum reply latency
+                    </Draw>
+                    <Draw
+                        Type="line"
+                        DataSource="ReplyDuration"
+                        Consolidation="AVERAGE"
+                        Color="#b415c7ff" >
+                        Average reply latency
+                    </Draw>
+                    <Draw
+                        Type="line"
+                        DataSource="ReplyDuration"
+                        Consolidation="MIN"
+                        Color="#4d18e4ff" >
+                        Minimum reply latency
+                    </Draw>
+                </Graph>
+            </GraphTable>
+        </Performances>
+    </Check>
+</NChecks>
