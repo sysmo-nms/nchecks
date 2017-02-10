@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks;
 
 import org.slf4j.Logger;
@@ -27,23 +26,22 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * Created by seb on 21/10/15.
  *
  * Allow the connexion to a StateServer
  */
 public class StateClient implements Runnable {
+
     private static StateClient instance = null;
-    private static ConcurrentHashMap<String,StateMessage> map = new ConcurrentHashMap<>();
-    private static int TIMEOUT = 2000;
+    private static ConcurrentHashMap<String, StateMessage> map = new ConcurrentHashMap<>();
+    private static final int TIMEOUT = 2000;
     private Logger logger;
     private static final Object lock = new Object();
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
     private Socket socket = null;
     private boolean normalShutdown = false;
-
 
     public static void start(InetAddress address, int port) throws Exception {
         synchronized (StateClient.lock) {
@@ -56,7 +54,6 @@ public class StateClient implements Runnable {
             }
         }
     }
-
 
     public static void stop() {
         StateClient sc = StateClient.instance;
@@ -86,7 +83,6 @@ public class StateClient implements Runnable {
             }
         }
     }
-
 
     private StateClient(InetAddress address, int port) throws Exception {
         if (port == 0) {
@@ -143,7 +139,6 @@ public class StateClient implements Runnable {
 
     }
 
-
     public static void setState(StateMessage msg) {
         synchronized (StateClient.lock) {
             try {
@@ -155,15 +150,14 @@ public class StateClient implements Runnable {
         }
     }
 
-
     public static Object getState(StateMessage msg) {
         StateClient.map.put(msg.getKey(), msg);
-        synchronized(StateClient.lock) {
+        synchronized (StateClient.lock) {
             try {
                 StateClient.instance.out.writeObject(msg);
                 StateClient.instance.out.flush();
             } catch (IOException e) {
-                StateClient.instance.logger.error(e.getMessage(),e);
+                StateClient.instance.logger.error(e.getMessage(), e);
                 return null;
             }
         }
@@ -186,31 +180,32 @@ public class StateClient implements Runnable {
         }
     }
 
-
     @Override
     public void run() {
         StateMessage message;
         this.logger.info("start run");
 
-        while (this.socket.isConnected()) try {
-            message = (StateMessage) this.in.readObject();
+        while (this.socket.isConnected()) {
+            try {
+                message = (StateMessage) this.in.readObject();
 
-            if (message.getAction() == StateMessage.GET) {
-                String key = message.getKey();
-                Object caller = StateClient.map.get(key);
-                StateClient.map.put(key, message);
-                synchronized (caller) {
-                    caller.notify();
+                if (message.getAction() == StateMessage.GET) {
+                    String key = message.getKey();
+                    Object caller = StateClient.map.get(key);
+                    StateClient.map.put(key, message);
+                    synchronized (caller) {
+                        caller.notify();
+                    }
                 }
+            } catch (IOException | ClassNotFoundException e) {
+                if (this.normalShutdown) {
+                    this.logger.info(e.getMessage(), e);
+                } else {
+                    this.logger.error(e.getMessage(), e);
+                    StateClient.stop();
+                }
+                break;
             }
-        } catch (IOException|ClassNotFoundException e) {
-            if (this.normalShutdown) {
-                this.logger.info(e.getMessage(), e);
-            } else {
-                this.logger.error(e.getMessage(), e);
-                StateClient.stop();
-            }
-            break;
         }
     }
 }

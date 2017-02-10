@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.impl;
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
@@ -49,29 +48,28 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 
+public class ErlangNodeNChecks implements Runnable {
 
-public class ErlangNodeNChecks implements Runnable
-{
-    public static final OtpErlangAtom atomReply = new OtpErlangAtom("reply");
-    public static final OtpErlangAtom atomOk = new OtpErlangAtom("ok");
-    public static final OtpErlangAtom atomError = new OtpErlangAtom("error");
-    public static final OtpErlangAtom atomQueueFull =
-            new OtpErlangAtom("queue_full");
+    public static final OtpErlangAtom ATOM_REPLY = new OtpErlangAtom("reply");
+    public static final OtpErlangAtom ATOM_OK = new OtpErlangAtom("ok");
+    public static final OtpErlangAtom ATOM_ERROR = new OtpErlangAtom("error");
+    public static final OtpErlangAtom ATOM_QUEUE_FULL
+            = new OtpErlangAtom("queue_full");
 
     // otp
-    private String nodeName;
-    private OtpMbox mbox;
-    private static final Object lock = new Object();
+    private final String nodeName;
+    private final OtpMbox mbox;
+    private static final Object LOCK = new Object();
 
     // nchecks vars
-    private ThreadPoolExecutor threadPool;
+    private final ThreadPoolExecutor threadPool;
 
     static ErlangNodeNChecks instance = null;
     static Logger logger = LoggerFactory.getLogger(ErlangNodeNChecks.class);
 
-
     /**
      * Start a Nchecks application that communicate with an erlang server.
+     *
      * @param mbox The jserver_nchecks mailbox
      * @param nodeName The name of the foreign node
      * @param rubyDir The ruby script dir
@@ -80,7 +78,7 @@ public class ErlangNodeNChecks implements Runnable
      * @param stateServer the state server address
      * @param stateServerPort the state server port
      * @return An ErlangNodeNChecks Instance
-     * @throws Exception
+     * @throws Exception startup error
      */
     public static synchronized ErlangNodeNChecks getInstance(
             final OtpMbox mbox, final String nodeName,
@@ -88,12 +86,11 @@ public class ErlangNodeNChecks implements Runnable
             final String etcDir, final InetAddress stateServer,
             final int stateServerPort) throws Exception {
         if (ErlangNodeNChecks.instance == null) {
-            ErlangNodeNChecks.instance = new ErlangNodeNChecks(mbox,nodeName,rubyDir,
-                    utilsDir,etcDir,stateServer,stateServerPort);
+            ErlangNodeNChecks.instance = new ErlangNodeNChecks(mbox, nodeName, rubyDir,
+                    utilsDir, etcDir, stateServer, stateServerPort);
         }
         return ErlangNodeNChecks.instance;
     }
-
 
     private ErlangNodeNChecks(
             final OtpMbox mbox, final String nodeName,
@@ -107,7 +104,7 @@ public class ErlangNodeNChecks implements Runnable
 
         // init thread pool
         this.threadPool = new ThreadPoolExecutor(
-                8,  // base pool size
+                8, // base pool size
                 20, // max pool size
                 60, // return to base after
                 TimeUnit.MINUTES,
@@ -127,24 +124,25 @@ public class ErlangNodeNChecks implements Runnable
         ErlangNodeNChecks.logger.info("SNMP started");
 
         // initialize state client
-        StateClient.start(stateServer,stateServerPort);
+        StateClient.start(stateServer, stateServerPort);
     }
-
 
     @Override
     public void run() {
         // loop and wait for calls
         ErlangNodeNChecks.logger.info("begin too loop");
         OtpErlangObject call;
-        while (true) try {
-            call = this.mbox.receive();
-            this.handleMsg(call);
-        } catch (OtpErlangExit e) {
-            ErlangNodeNChecks.logger.info(e.getMessage(), e);
-            break;
-        } catch (OtpErlangDecodeException e) {
-            ErlangNodeNChecks.logger.error(e.getMessage(), e);
-            break;
+        while (true) {
+            try {
+                call = this.mbox.receive();
+                this.handleMsg(call);
+            } catch (OtpErlangExit e) {
+                ErlangNodeNChecks.logger.info(e.getMessage(), e);
+                break;
+            } catch (OtpErlangDecodeException e) {
+                ErlangNodeNChecks.logger.error(e.getMessage(), e);
+                break;
+            }
         }
         this.threadPool.shutdownNow();
         StateClient.stop();
@@ -152,73 +150,63 @@ public class ErlangNodeNChecks implements Runnable
         this.mbox.exit("crach");
     }
 
-
     /**
-     * Send a message to the caller.
-     * Used by SnmpmanResponseListener SnmpmanTreeListener and SnmpmanTableListener
-     * which are executed in the asynchroneously in another thread.
+     * Send a message to the caller. Used by SnmpmanResponseListener
+     * SnmpmanTreeListener and SnmpmanTableListener which are executed in the
+     * asynchroneously in another thread.
+     *
+     * @param to destination
+     * @param msg message
      */
     public static void sendReply(
-            final OtpErlangObject to, final OtpErlangObject msg)
-    {
+            final OtpErlangObject to, final OtpErlangObject msg) {
         OtpErlangObject[] obj = new OtpErlangObject[3];
-        obj[0] = atomReply;
+        obj[0] = ATOM_REPLY;
         obj[1] = to;
         obj[2] = msg;
         OtpErlangTuple tuple = new OtpErlangTuple(obj);
-        synchronized(ErlangNodeNChecks.lock)
-        {
+        synchronized (ErlangNodeNChecks.LOCK) {
             ErlangNodeNChecks.instance.mbox.send(
                     "j_server_nchecks", ErlangNodeNChecks.instance.nodeName, tuple);
         }
     }
 
-
-    public static OtpErlangTuple buildOkReply(final OtpErlangObject msg)
-    {
+    public static OtpErlangTuple buildOkReply(final OtpErlangObject msg) {
         OtpErlangObject[] valObj = new OtpErlangObject[2];
-        valObj[0] = atomOk;
+        valObj[0] = ATOM_OK;
         valObj[1] = msg;
         return new OtpErlangTuple(valObj);
     }
 
-
-    public static OtpErlangTuple buildErrorReply(final OtpErlangObject msg)
-    {
+    public static OtpErlangTuple buildErrorReply(final OtpErlangObject msg) {
         OtpErlangObject[] valObj = new OtpErlangObject[2];
-        valObj[0] = atomError;
+        valObj[0] = ATOM_ERROR;
         valObj[1] = msg;
         return new OtpErlangTuple(valObj);
     }
 
-
-    public static OtpErlangTuple buildQueueFullReply(final OtpErlangObject msg)
-    {
+    public static OtpErlangTuple buildQueueFullReply(final OtpErlangObject msg) {
         OtpErlangObject[] valObj = new OtpErlangObject[2];
-        valObj[0] = atomQueueFull;
+        valObj[0] = ATOM_QUEUE_FULL;
         valObj[1] = msg;
         return new OtpErlangTuple(valObj);
     }
 
-
-    private void handleInit(OtpErlangTuple initMsg)
-    {
+    private void handleInit(OtpErlangTuple initMsg) {
         ErlangNodeNChecks.logger.info("init?" + initMsg.toString());
     }
 
-
-    private void handleMsg(final OtpErlangObject msg)
-    {
-        OtpErlangTuple  tuple;
-        OtpErlangAtom   command;
+    private void handleMsg(final OtpErlangObject msg) {
+        OtpErlangTuple tuple;
+        OtpErlangAtom command;
         OtpErlangObject caller;
-        OtpErlangTuple  payload;
+        OtpErlangTuple payload;
         try {
-            tuple       = (OtpErlangTuple)  msg;
-            command     = (OtpErlangAtom)   (tuple.elementAt(0));
-            caller      =                    tuple.elementAt(1);
-            payload     = (OtpErlangTuple)  (tuple.elementAt(2));
-        } catch (Exception|Error e) {
+            tuple = (OtpErlangTuple) msg;
+            command = (OtpErlangAtom) (tuple.elementAt(0));
+            caller = tuple.elementAt(1);
+            payload = (OtpErlangTuple) (tuple.elementAt(2));
+        } catch (Exception | Error e) {
             ErlangNodeNChecks.logger.warn(
                     "Fail to decode tuple: " + e.getMessage(), e);
             return;
@@ -227,19 +215,15 @@ public class ErlangNodeNChecks implements Runnable
         try {
             String cmdString = command.toString();
 
-            switch (cmdString)
-            {
+            switch (cmdString) {
                 case "check":
-                    OtpErlangString erlangCheckClassName = (OtpErlangString)
-                            (payload.elementAt(0));
+                    OtpErlangString erlangCheckClassName = (OtpErlangString) (payload.elementAt(0));
 
                     String checkClassName = erlangCheckClassName.stringValue();
 
-                    OtpErlangList checkArgs = (OtpErlangList)
-                            (payload.elementAt(1));
+                    OtpErlangList checkArgs = (OtpErlangList) (payload.elementAt(1));
 
-                    OtpErlangString checkId = (OtpErlangString)
-                            (payload.elementAt(2));
+                    OtpErlangString checkId = (OtpErlangString) (payload.elementAt(2));
 
                     Runnable checkWorker = new NChecksRunnable(
                             Class.forName(checkClassName).newInstance(),
@@ -250,11 +234,11 @@ public class ErlangNodeNChecks implements Runnable
                     break;
 
                 case "helper":
-                    OtpErlangString erlangHelperClassName =
-                            (OtpErlangString) (payload.elementAt(0));
+                    OtpErlangString erlangHelperClassName
+                            = (OtpErlangString) (payload.elementAt(0));
                     String helperClassName = erlangHelperClassName.stringValue();
-                    OtpErlangList args =
-                            (OtpErlangList) (payload.elementAt(1));
+                    OtpErlangList args
+                            = (OtpErlangList) (payload.elementAt(1));
                     Runnable helperWorker = new NHelperRunnable(
                             Class.forName(helperClassName).newInstance(),
                             caller,
@@ -274,9 +258,7 @@ public class ErlangNodeNChecks implements Runnable
                     OtpErlangObject reply = buildErrorReply(command);
                     ErlangNodeNChecks.sendReply(caller, reply);
             }
-        }
-        catch (Exception|Error e)
-        {
+        } catch (Exception | Error e) {
             ErlangNodeNChecks.logger.error(e.getMessage(), e);
             OtpErlangTuple reply = buildErrorReply(
                     new OtpErlangString("ErlangNodeNChecks error: " + e
@@ -286,15 +268,12 @@ public class ErlangNodeNChecks implements Runnable
         }
     }
 
-
-    public static Map<String,Argument> decodeArgs(final OtpErlangList argList)
-    {
-        Map<String,Argument> result = new HashMap<>();
+    public static Map<String, Argument> decodeArgs(final OtpErlangList argList) {
+        Map<String, Argument> result = new HashMap<>();
         Iterator<OtpErlangObject> itr = argList.iterator();
         OtpErlangTuple element;
-        while (itr.hasNext())
-        {
-            element             = (OtpErlangTuple) (itr.next());
+        while (itr.hasNext()) {
+            element = (OtpErlangTuple) (itr.next());
             OtpErlangString key = (OtpErlangString) (element.elementAt(0));
             OtpErlangObject val = element.elementAt(1);
             if (val.getClass() == OtpErlangString.class) {
@@ -310,18 +289,17 @@ public class ErlangNodeNChecks implements Runnable
         return result;
     }
 
-
     interface CheckCaller {
+
         OtpErlangObject getCaller();
     }
 
+    static class NChecksPoolReject implements RejectedExecutionHandler {
 
-    static class NChecksPoolReject implements RejectedExecutionHandler
-    {
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor)
-        {
-            OtpErlangString errMsg =
-                    new OtpErlangString("ErlangNodeNChecks thread queue is full");
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            OtpErlangString errMsg
+                    = new OtpErlangString("ErlangNodeNChecks thread queue is full");
             CheckCaller ncheckRun = (CheckCaller) r;
             OtpErlangObject caller = ncheckRun.getCaller();
             OtpErlangObject reply = ErlangNodeNChecks.buildQueueFullReply(errMsg);
@@ -329,32 +307,29 @@ public class ErlangNodeNChecks implements Runnable
         }
     }
 
+    static class NChecksRunnable implements Runnable, CheckCaller {
 
-    static class NChecksRunnable implements Runnable, CheckCaller
-    {
-        private CheckInterface check;
-        private OtpErlangObject  caller;
-        private OtpErlangList    args;
-        private String           stateId;
+        private final CheckInterface check;
+        private final OtpErlangObject caller;
+        private final OtpErlangList args;
+        private final String stateId;
 
         public NChecksRunnable(
-                Object          checkObj,
+                Object checkObj,
                 OtpErlangObject callerObj,
-                OtpErlangList   argsList,
-                OtpErlangString stateId)
-        {
-            this.check   = (CheckInterface) checkObj;
-            this.caller  = callerObj;
-            this.args    = argsList;
+                OtpErlangList argsList,
+                OtpErlangString stateId) {
+            this.check = (CheckInterface) checkObj;
+            this.caller = callerObj;
+            this.args = argsList;
             this.stateId = stateId.stringValue();
         }
 
         @Override
-        public void run()
-        {
+        public void run() {
             // build a query from arguments
-            Query query =
-                   new Query(ErlangNodeNChecks.decodeArgs(this.args), this.stateId);
+            Query query
+                    = new Query(ErlangNodeNChecks.decodeArgs(this.args), this.stateId);
 
             // execute and get reply
             Reply reply = this.check.execute(query);
@@ -367,48 +342,45 @@ public class ErlangNodeNChecks implements Runnable
             ErlangNodeNChecks.sendReply(this.caller, replyMsg);
         }
 
-        public OtpErlangObject getCaller() {return this.caller;}
+        @Override
+        public OtpErlangObject getCaller() {
+            return this.caller;
+        }
     }
 
+    static class NHelperRunnable implements Runnable, CheckCaller {
 
-    static class NHelperRunnable implements Runnable, CheckCaller
-    {
-        private HelperInterface helper;
-        private OtpErlangObject   caller;
-        private OtpErlangList     args;
-
+        private final HelperInterface helper;
+        private final OtpErlangObject caller;
+        private final OtpErlangList args;
 
         public NHelperRunnable(
                 final Object helpObj,
                 final OtpErlangObject callerObj,
-                final OtpErlangList argsList)
-        {
-            this.helper    = (HelperInterface) helpObj;
-            this.caller    = callerObj;
-            this.args      = argsList;
+                final OtpErlangList argsList) {
+            this.helper = (HelperInterface) helpObj;
+            this.caller = callerObj;
+            this.args = argsList;
         }
 
-
         @Override
-        public void run()
-        {
+        public void run() {
             Query query = new Query(ErlangNodeNChecks.decodeArgs(this.args));
             HelperReply helperReply = helper.callHelper(query);
-            OtpErlangList jsonCharList =
-                    this.buildErlangCharList(helperReply.toCharArray());
+            OtpErlangList jsonCharList
+                    = this.buildErlangCharList(helperReply.toCharArray());
             OtpErlangObject replyMsg = ErlangNodeNChecks.buildOkReply(jsonCharList);
             ErlangNodeNChecks.sendReply(this.caller, replyMsg);
         }
 
+        @Override
+        public OtpErlangObject getCaller() {
+            return this.caller;
+        }
 
-        public OtpErlangObject getCaller() {return this.caller;}
-
-
-        private OtpErlangList buildErlangCharList(char[] charList)
-        {
+        private OtpErlangList buildErlangCharList(char[] charList) {
             OtpErlangObject[] objList = new OtpErlangObject[charList.length];
-            for (int i = 0; i < charList.length; i++)
-            {
+            for (int i = 0; i < charList.length; i++) {
                 objList[i] = new OtpErlangChar(charList[i]);
             }
             return new OtpErlangList(objList);

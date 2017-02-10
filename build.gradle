@@ -1,15 +1,18 @@
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'signing'
+//apply plugin: 'signing'
 apply plugin: 'pmd'
 apply plugin: 'findbugs'
 apply plugin: 'jdepend'
+apply plugin: 'application'
 
+mainClassName = 'io.sysmo.nchecks.impl.CommandLine'
 sourceCompatibility = 1.7
 group = "io.sysmo"
 archivesBaseName = "nchecks"
 
 /*
+ * Uncomment "plugin: 'signing' then:
  * "gradle uploadArchives" will upload:
  * version = "X.X.X"          -> a new release
  * version = "X.X.X-SNAPSHOT" -> a new snapshot
@@ -51,15 +54,14 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-signing {
-    sign configurations.archives
-}
-
 javadoc {
     options.overview = "overview.html"
     options.docTitle = "NChecks API"
     options.windowTitle = "NChecks API"
 }
+
+
+
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.2'
@@ -74,47 +76,54 @@ dependencies {
 }
 
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'nchecks monitoring library'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'nchecks monitoring library'
-                url 'http://www.sysmo.io'
-
-                scm {
-                    connection 'scm:git:git@github.com:://github.com:sysom-nms/nchecks.git'
-                    developerConnection 'scm:git:git@github.com:://github.com:sysmo-nms/nchecks.git'
-                    url 'git@github.com:sysmo-nms/nchecks.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'ssbx'
-                        name 'Sebastien Serre'
-                        email 'ssbx@sysmo.io'
-                    }
-                }
-            }
-        }
-    }
+/*
+signing {
+sign configurations.archives
 }
+
+
+uploadArchives {
+repositories {
+mavenDeployer {
+beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+authentication(userName: ossrhUsername, password: ossrhPassword)
+}
+
+snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+authentication(userName: ossrhUsername, password: ossrhPassword)
+}
+
+pom.project {
+name 'nchecks monitoring library'
+packaging 'jar'
+// optionally artifactId can be defined here
+description 'nchecks monitoring library'
+url 'http://www.sysmo.io'
+
+scm {
+connection 'scm:git:git@github.com:://github.com:sysmo-nms/nchecks.git'
+developerConnection 'scm:git:git@github.com:://github.com:sysmo-nms/nchecks.git'
+url 'git@github.com:sysmo-nms/nchecks.git'
+}
+
+licenses {
+license {
+name 'The Apache License, Version 2.0'
+url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+}
+}
+
+developers {
+developer {
+id 'ssbx'
+name 'Sebastien Serre'
+email 'ssbx@sysmo.io'
+}
+}
+}
+}
+}
+}
+ */

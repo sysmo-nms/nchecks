@@ -15,8 +15,8 @@
  */
 package io.sysmo.nchecks;
 
-public class Argument
-{
+public class Argument {
+
     private String argument;
 
     public Argument() {
@@ -25,14 +25,18 @@ public class Argument
 
     /**
      * Internal use only.
+     *
      * @param val the string value of the argument
      */
-    public void set(String val) {this.argument = val;}
+    public void set(String val) {
+        this.argument = val;
+    }
 
     /**
      * Return the integer representation of the argument.
+     *
      * @return integer representation of the argument
-     * @throws NumberFormatException
+     * @throws NumberFormatException bad number
      */
     public int asInteger() throws NumberFormatException {
         return Integer.parseInt(this.argument);
@@ -40,7 +44,10 @@ public class Argument
 
     /**
      * Return the string value of argument
+     *
      * @return the original argument string
      */
-    public String asString() {return this.argument;}
+    public String asString() {
+        return this.argument;
+    }
 }

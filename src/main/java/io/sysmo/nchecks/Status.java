@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks;
 
 import java.io.Serializable;
@@ -26,32 +25,39 @@ import java.io.Serializable;
  *
  * Status weight:
  * <ul>
- *     <li>OK 10</li>
- *     <li>UNKNOWN 20</li>
- *     <li>WARNING 30</li>
- *     <li>CRITICAL 40</li>
- *     <li>ERROR 50</li>
+ * <li>OK 10</li>
+ * <li>UNKNOWN 20</li>
+ * <li>WARNING 30</li>
+ * <li>CRITICAL 40</li>
+ * <li>ERROR 50</li>
  * </ul>
  *
  */
 public class Status implements Comparable<Status>, Serializable {
-    public static final Status OK = new Status("OK", 10);
-    public static final Status UNKNOWN = new Status("UNKNOWN",20);
-    public static final Status WARNING = new Status("WARNING",30);
-    public static final Status CRITICAL = new Status("CRITICAL",40);
-    public static final Status ERROR = new Status("ERROR",50);
 
-    private String str;
-    private int weight;
+    public static final Status OK = new Status("OK", 10);
+    public static final Status UNKNOWN = new Status("UNKNOWN", 20);
+    public static final Status WARNING = new Status("WARNING", 30);
+    public static final Status CRITICAL = new Status("CRITICAL", 40);
+    public static final Status ERROR = new Status("ERROR", 50);
+
+    private final String str;
+    private final int weight;
 
     public static Status fromString(String str) {
         switch (str) {
-            case "UNKNOWN": return Status.UNKNOWN;
-            case "OK": return Status.OK;
-            case "ERROR": return Status.ERROR;
-            case "WARNING": return Status.WARNING;
-            case "CRITICAL": return Status.CRITICAL;
-            default: return null;
+            case "UNKNOWN":
+                return Status.UNKNOWN;
+            case "OK":
+                return Status.OK;
+            case "ERROR":
+                return Status.ERROR;
+            case "WARNING":
+                return Status.WARNING;
+            case "CRITICAL":
+                return Status.CRITICAL;
+            default:
+                return null;
         }
     }
 
@@ -60,6 +66,7 @@ public class Status implements Comparable<Status>, Serializable {
         this.weight = weight;
     }
 
+    @Override
     public int compareTo(Status status) {
         int other = status.getWeight();
         if (this.weight == other) {
@@ -72,7 +79,7 @@ public class Status implements Comparable<Status>, Serializable {
     }
 
     public boolean equals(Status status) {
-        return (status.getWeight() == this.getWeight());
+        return status.getWeight() == this.getWeight();
     }
 
     private int getWeight() {

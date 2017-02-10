@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks;
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class HelperTableRow
-{
-    private ArrayList<HelperTableItem> items;
+public class HelperTableRow {
+
+    private final ArrayList<HelperTableItem> items;
 
     public HelperTableRow() {
-        items = new ArrayList<>();
+        this.items = new ArrayList<>();
     }
 
     /**
      * Add the string value "value" to the column "column".
+     *
+     * @param column the column
+     * @param value the value
      */
     public void addItem(String column, String value) {
-        items.add(new HelperTableItem(column, value));
+        this.items.add(new HelperTableItem(column, value));
     }
 
     /**
      * Return the list of HelperTableItem for the row.
+     *
+     * @return items
      */
     public List<HelperTableItem> getItems() {
-        return items;
+        return this.items;
     }
 }
