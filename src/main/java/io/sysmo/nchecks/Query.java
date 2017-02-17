@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 package io.sysmo.nchecks;
+
 import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;
 
 /**
- * The Reply class contain all the values and data related to the execution of
- * a module implementing NCheckInterface (a check module).
+ * The Reply class contain all the values and data related to the execution of a
+ * module implementing NCheckInterface (a check module).
  *
  * @see io.sysmo.nchecks.Reply
  */
-public class Query
-{
-    private Map<String,Argument> arguments;
-    private String               stateId;
+public class Query {
 
+    final private Map<String, Argument> arguments;
+    private String stateId;
 
     /**
      * Private use only.
@@ -37,12 +37,10 @@ public class Query
      * @param args a map of Arguments
      * @param stateId a unique string identifying the probe
      */
-    public Query(Map<String,Argument> args, final String stateId)
-    {
-        this.stateId    = stateId;
-        this.arguments  = new HashMap<>(args);
+    public Query(Map<String, Argument> args, final String stateId) {
+        this.stateId = stateId;
+        this.arguments = new HashMap<>(args);
     }
-
 
     /**
      * Private use only.
@@ -51,24 +49,17 @@ public class Query
      *
      * @param args a map of Argument
      */
-    public Query(Map<String,Argument> args)
-    {
+    public Query(Map<String, Argument> args) {
         this.arguments = new HashMap<>(args);
     }
-
 
     /**
      * Retrieve the object stored from previous call.
      *
      * example:
      *
-     * ...
-     * MyStateClass state = (MyStateClass) reply.getState();
-     * if (state == null) {
-     *    // initialize a new state then
-     *    state = new MySateClass();
-     * }
-     * ...
+     * ... MyStateClass state = (MyStateClass) reply.getState(); if (state ==
+     * null) { // initialize a new state then state = new MySateClass(); } ...
      *
      * @see io.sysmo.nchecks.Reply#setState(Serializable)
      * @return an Object set from Reply.setState or null
@@ -81,7 +72,6 @@ public class Query
         return StateClient.getState(msg);
     }
 
-
     /**
      *
      * @return the unique string identifying the probe
@@ -91,8 +81,8 @@ public class Query
     }
 
     /**
-     * Return the argument identified by key or null if the key
-     * does not exist.
+     * Return the argument identified by key or null if the key does not exist.
+     *
      * @param key the flag identifying the argument
      * @return the argument or null
      */
