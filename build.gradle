@@ -7,7 +7,7 @@ apply plugin: 'jdepend'
 apply plugin: 'application'
 
 mainClassName = 'io.sysmo.nchecks.impl.CommandLine'
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 group = "io.sysmo"
 archivesBaseName = "nchecks"
 
