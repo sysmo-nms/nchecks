@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -26,14 +25,12 @@ import org.jruby.embed.ScriptingContainer;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-public class CheckViaJRuby implements CheckInterface
-{
+public class CheckViaJRuby implements CheckInterface {
 
-    private static Logger logger = LoggerFactory.getLogger(CheckViaJRuby.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckViaJRuby.class);
 
-
-    public Reply execute(Query query)
-    {
+    @Override
+    public Reply execute(Query query) {
 
         // try to get the ScriptingContainer of the script
         String rbScript = "undefined";
@@ -45,12 +42,11 @@ public class CheckViaJRuby implements CheckInterface
 
         } catch (Exception e) {
 
-            CheckViaJRuby.logger.error(e.getMessage(), e);
+            CheckViaJRuby.LOGGER.error(e.getMessage(), e);
             return CheckViaJRuby.handleException(
                     "Script not found: " + rbScript, e);
 
         }
-
 
         // try to call it
         Reply rep;
@@ -59,24 +55,23 @@ public class CheckViaJRuby implements CheckInterface
             rep = script.callMethod(null, "check", query, Reply.class);
             return rep;
 
-        } catch(Exception e) {
+        } catch (Exception e) {
 
-            CheckViaJRuby.logger.error(e.getMessage(), e);
+            CheckViaJRuby.LOGGER.error(e.getMessage(), e);
             return CheckViaJRuby.handleException(
                     "Script execution failure: " + rbScript, e);
 
         } catch (Error e) {
 
-            CheckViaJRuby.logger.error("JRuby exec error");
+            CheckViaJRuby.LOGGER.error("JRuby exec error");
             return CheckViaJRuby.handleError("Script execution failure.");
 
         }
     }
 
-    private static Reply handleException(String txt, Exception e)
-    {
+    private static Reply handleException(String txt, Exception e) {
 
-        CheckViaJRuby.logger.error(e.getMessage(), e);
+        CheckViaJRuby.LOGGER.error(e.getMessage(), e);
 
         Reply reply = new Reply();
         reply.setStatus(Status.ERROR);
@@ -86,8 +81,7 @@ public class CheckViaJRuby implements CheckInterface
 
     }
 
-    private static Reply handleError(String txt)
-    {
+    private static Reply handleError(String txt) {
 
         Reply reply = new Reply();
         reply.setStatus(Status.ERROR);

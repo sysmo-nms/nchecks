@@ -25,12 +25,14 @@ import java.net.InetSocketAddress;
 import java.net.InetAddress;
 
 import io.sysmo.nchecks.Status;
+import java.io.IOException;
+import java.net.UnknownHostException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 public class CheckTCP implements CheckInterface {
 
-    private static Logger logger = LoggerFactory.getLogger(CheckTCP.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckTCP.class);
 
     private String host = "";
     private int port = 0;
@@ -84,14 +86,14 @@ public class CheckTCP implements CheckInterface {
                 acceptState = Status.fromString(acceptStateArg.asString());
             }
         } catch (Exception | Error e) {
-            CheckTCP.logger.info(e.getMessage(), e);
+            CheckTCP.LOGGER.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckTCP ERROR: Bad or wrong arguments: " + e.getMessage());
             return reply;
         }
 
         if (port == 0 || port > 65535) {
-            CheckTCP.logger.info("Bad port definition: " + port);
+            CheckTCP.LOGGER.info("Bad port definition: " + port);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckTCP ERROR: Bad port definition " + port);
             return reply;
@@ -100,8 +102,8 @@ public class CheckTCP implements CheckInterface {
         InetAddress addr;
         try {
             addr = InetAddress.getByName(host);
-        } catch (Exception e) {
-            CheckTCP.logger.info(e.getMessage(), e);
+        } catch (UnknownHostException e) {
+            CheckTCP.LOGGER.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckTCP ERROR: Host lookup fail for: " + host + " " + e.getMessage());
             return reply;
@@ -115,7 +117,7 @@ public class CheckTCP implements CheckInterface {
             sock.connect(new InetSocketAddress(addr, port), msTimeout);
             stop = System.nanoTime();
             sock.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             reply.setReply("CheckTCP " + refuseState.toString() + " " + e.getMessage());
             reply.setStatus(refuseState);
             return reply;

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -38,24 +37,25 @@ import java.util.List;
 /**
  * Definition of the check is in the file CheckIfXBroadcast.xml
  */
-public class CheckIfXBroadcast implements CheckInterface
-{
-    private static Logger logger = LoggerFactory.getLogger(CheckIfXBroadcast.class);
-    private static String IF_INDEX         = "1.3.6.1.2.1.2.2.1.1";
-    private static String IF_IN_BROADCAST  = "1.3.6.1.2.1.31.1.1.1.3";
-    private static String IF_OUT_BROADCAST = "1.3.6.1.2.1.31.1.1.1.5";
+public class CheckIfXBroadcast implements CheckInterface {
 
-    private static OID[] columns = new OID[]{
-            new OID(IF_INDEX),
-            new OID(IF_IN_BROADCAST),
-            new OID(IF_OUT_BROADCAST)
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckIfXBroadcast.class);
+    private static final String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
+    private static final String IF_IN_BROADCAST = "1.3.6.1.2.1.31.1.1.1.3";
+    private static final String IF_OUT_BROADCAST = "1.3.6.1.2.1.31.1.1.1.5";
+
+    private static final OID[] COLUMNS = new OID[]{
+        new OID(IF_INDEX),
+        new OID(IF_IN_BROADCAST),
+        new OID(IF_OUT_BROADCAST)
     };
 
-    public CheckIfXBroadcast() {}
+    public CheckIfXBroadcast() {
+    }
 
-    public Reply execute(Query query)
-    {
-        Reply  reply = new Reply();
+    @Override
+    public Reply execute(Query query) {
+        Reply reply = new Reply();
         String error = "undefined";
         String ifSelection;
         int warningThreshold;
@@ -65,8 +65,8 @@ public class CheckIfXBroadcast implements CheckInterface
             ifSelection = query.get("if_selection").asString();
             warningThreshold = query.get("warning_threshold").asInteger();
             criticalThreshold = query.get("critical_threshold").asInteger();
-        } catch (Exception|Error e) {
-            CheckIfXBroadcast.logger.error(e.getMessage(), e);
+        } catch (Exception | Error e) {
+            CheckIfXBroadcast.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Missing or wrong argument: " + e);
             return reply;
@@ -102,12 +102,11 @@ public class CheckIfXBroadcast implements CheckInterface
             AbstractTarget target = Manager.getTarget(query);
             TableUtils tableWalker = Manager.getTableUtils(state.getPduType());
             List<TableEvent> snmpReply = tableWalker.getTable(
-                    target, CheckIfXBroadcast.columns,
+                    target, CheckIfXBroadcast.COLUMNS,
                     lowerBoundIndex, upperBoundIndex);
 
             // TODO check the last element of the list see TableUtils.getTable
             // and TableEvent.getStatus()
-
             // asList for List.contains
             List<Integer> intList = Arrays.asList(indexesArrayInt);
             Iterator<TableEvent> it = snmpReply.iterator();
@@ -115,7 +114,7 @@ public class CheckIfXBroadcast implements CheckInterface
             while (it.hasNext()) {
                 evt = it.next();
                 error = evt.getErrorMessage();
-                VariableBinding[]   vbs = evt.getColumns();
+                VariableBinding[] vbs = evt.getColumns();
                 Integer ifIndex = vbs[0].getVariable().toInt();
 
                 if (intList.contains(ifIndex)) {
@@ -148,8 +147,8 @@ public class CheckIfXBroadcast implements CheckInterface
             reply.setStatus(newStatus);
             reply.setReply(replyMsg);
             return reply;
-        } catch (Exception|Error e) {
-            CheckIfXBroadcast.logger.error(e.getMessage(), e);
+        } catch (Exception | Error e) {
+            CheckIfXBroadcast.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Error: " + error);
             return reply;

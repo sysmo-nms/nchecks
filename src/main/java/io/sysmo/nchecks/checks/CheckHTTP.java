@@ -24,7 +24,7 @@ import org.slf4j.Logger;
  */
 public class CheckHTTP implements CheckInterface {
 
-    private static Logger logger = LoggerFactory.getLogger(CheckTCP.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(CheckTCP.class);
 
     public CheckHTTP() {
 
@@ -51,7 +51,7 @@ public class CheckHTTP implements CheckInterface {
                 method = method_arg.asString();
             }
         } catch (Exception | Error e) {
-            CheckHTTP.logger.info(e.getMessage(), e);
+            CheckHTTP.LOGGER.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckHTTP ERROR: Bad arguments: " + e.getMessage());
             return reply;
@@ -61,7 +61,7 @@ public class CheckHTTP implements CheckInterface {
         try {
             urlobj = new URL(uri);
         } catch (MalformedURLException e) {
-            CheckHTTP.logger.info(e.getMessage(), e);
+            CheckHTTP.LOGGER.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckHTTP ERROR: " + e.getMessage());
             return reply;
@@ -71,7 +71,7 @@ public class CheckHTTP implements CheckInterface {
         try {
             con = (HttpURLConnection) urlobj.openConnection();
         } catch (IOException e) {
-            CheckHTTP.logger.info(e.getMessage(), e);
+            CheckHTTP.LOGGER.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckHTTP ERROR " + e.getMessage());
             return reply;
@@ -82,23 +82,29 @@ public class CheckHTTP implements CheckInterface {
             try {
                 con.setRequestMethod(method);
             } catch (ProtocolException e) {
-                CheckHTTP.logger.info(e.getMessage(), e);
+                CheckHTTP.LOGGER.info(e.getMessage(), e);
                 reply.setStatus(Status.ERROR);
                 reply.setReply("CheckHTTP ERROR " + e.getMessage());
                 return reply;
             }
         }
 
-        int responseCode = -1;
+        long start;
+        long stop;
+        int responseCode;
         try {
+            start = System.nanoTime();
             responseCode = con.getResponseCode();
+            stop = System.nanoTime();
         } catch (IOException e) {
-            CheckHTTP.logger.info(e.getMessage(), e);
+            CheckHTTP.LOGGER.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckHTTP ERROR " + e.getMessage());
             return reply;
         }
 
+        long elapsed = (stop - start) / 1000000;
+        reply.putPerformance("ReplyDuration", elapsed);
         try {
             if (compareStatuses(responseCode, ok_status)) {
                 reply.setStatus(Status.OK);
@@ -111,7 +117,7 @@ public class CheckHTTP implements CheckInterface {
             }
 
         } catch (Exception e) {
-            CheckHTTP.logger.info(e.getMessage(), e);
+            CheckHTTP.LOGGER.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckHTTP ERROR " + e.getMessage());
             return reply;

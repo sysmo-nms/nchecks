@@ -32,25 +32,33 @@ import java.util.Random;
  * Do nothing but return a random return status.
  *
  */
-
 public class CheckDummySimple implements CheckInterface {
 
-    private static Logger logger = LoggerFactory.getLogger(CheckDummySimple.class);
-    private static Random randomGenerator = new Random();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckDummySimple.class);
+    private static final Random RANDOM_GENERATOR = new Random();
 
-    public CheckDummySimple() {}
+    public CheckDummySimple() {
+    }
 
+    @Override
     public Reply execute(Query query) {
 
-
         Reply reply = new Reply();
-        int random = randomGenerator.nextInt(4);
+        int random = RANDOM_GENERATOR.nextInt(4);
         reply.setReply("Dummy reply with status: " + Integer.toString(random));
         switch (random) {
-            case 0:  reply.setStatus(Status.WARNING); break;
-            case 1:  reply.setStatus(Status.CRITICAL); break;
-            case 2:  reply.setStatus(Status.ERROR); break;
-            default: reply.setStatus(Status.OK); break;
+            case 0:
+                reply.setStatus(Status.WARNING);
+                break;
+            case 1:
+                reply.setStatus(Status.CRITICAL);
+                break;
+            case 2:
+                reply.setStatus(Status.ERROR);
+                break;
+            default:
+                reply.setStatus(Status.OK);
+                break;
         }
 
         return reply;

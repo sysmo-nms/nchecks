@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.snmp;
 
 import io.sysmo.nchecks.Query;
@@ -31,10 +30,10 @@ import java.util.List;
 /**
  * Created by seb on 30/05/16.
  */
-public class TableWalker
-{
-    private List<OID>     columns;
-    private List<Integer> indexes;
+public class TableWalker {
+
+    private final List<OID> columns;
+    private final List<Integer> indexes;
 
     public TableWalker() {
         this.columns = new ArrayList<>();

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.helpers;
 
 import io.sysmo.nchecks.HelperInterface;
@@ -36,73 +35,74 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provide a selectable list of interfaces with multiple choices,
- * grouped by ifType.
+ * Provide a selectable list of interfaces with multiple choices, grouped by
+ * ifType.
  */
 public class GetIfXTableHelper implements HelperInterface {
 
-    private static final String IF_INDEX       = "1.3.6.1.2.1.2.2.1.1";
-    private static final String IF_DESCR       = "1.3.6.1.2.1.2.2.1.2";
-    private static final String IF_TYPE        = "1.3.6.1.2.1.2.2.1.3";
+    private static final String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
+    private static final String IF_DESCR = "1.3.6.1.2.1.2.2.1.2";
+    private static final String IF_TYPE = "1.3.6.1.2.1.2.2.1.3";
     private static final String IF_PHYSADDRESS = "1.3.6.1.2.1.2.2.1.6";
-    private static final String IF_X_ALIAS     = "1.3.6.1.2.1.31.1.1.1.18";
+    private static final String IF_X_ALIAS = "1.3.6.1.2.1.31.1.1.1.18";
 
-    private static final OID[] columns = new OID[]{
-            new OID(IF_INDEX),
-            new OID(IF_DESCR),
-            new OID(IF_TYPE),
-            new OID(IF_PHYSADDRESS),
-            new OID(IF_X_ALIAS)
+    private static final OID[] COLUMNS = new OID[]{
+        new OID(IF_INDEX),
+        new OID(IF_DESCR),
+        new OID(IF_TYPE),
+        new OID(IF_PHYSADDRESS),
+        new OID(IF_X_ALIAS)
     };
 
-    private static final Map<String, String> iftype;
-    static
-    {
-        iftype = new HashMap<>();
-        iftype.put("1", "other");
-        iftype.put("2", "regular1822");
-        iftype.put("3", "hdh1822");
-        iftype.put("4", "ddn-x25");
-        iftype.put("5", "rfc877-x25");
-        iftype.put("6", "ethernet-csmacd");
-        iftype.put("7", "iso88023-csmacd");
-        iftype.put("8", "iso88024-tokenBus");
-        iftype.put("9", "iso88025-tokenRing");
-        iftype.put("10", "iso88026-man");
-        iftype.put("11", "starLan");
-        iftype.put("12", "proteon-10Mbit");
-        iftype.put("13", "proteon-80Mbit");
-        iftype.put("14", "hyperchannel");
-        iftype.put("15", "fddi");
-        iftype.put("16", "lapb");
-        iftype.put("17", "sdlc");
-        iftype.put("18", "ds1");
-        iftype.put("19", "e1");
-        iftype.put("20", "basicISDN");
-        iftype.put("21", "primaryISDN");
-        iftype.put("22", "propPointToPointSerial");
-        iftype.put("23", "ppp");
-        iftype.put("24", "softwareLoopback");
-        iftype.put("25", "eon");
-        iftype.put("26", "ethernet-3Mbit");
-        iftype.put("27", "nsip");
-        iftype.put("28", "slip");
-        iftype.put("29", "ultra");
-        iftype.put("30", "ds3");
-        iftype.put("31", "sip");
-        iftype.put("32", "frame-relay");
+    private static final Map<String, String> IF_TYPES;
+
+    static {
+        IF_TYPES = new HashMap<>();
+        IF_TYPES.put("1", "other");
+        IF_TYPES.put("2", "regular1822");
+        IF_TYPES.put("3", "hdh1822");
+        IF_TYPES.put("4", "ddn-x25");
+        IF_TYPES.put("5", "rfc877-x25");
+        IF_TYPES.put("6", "ethernet-csmacd");
+        IF_TYPES.put("7", "iso88023-csmacd");
+        IF_TYPES.put("8", "iso88024-tokenBus");
+        IF_TYPES.put("9", "iso88025-tokenRing");
+        IF_TYPES.put("10", "iso88026-man");
+        IF_TYPES.put("11", "starLan");
+        IF_TYPES.put("12", "proteon-10Mbit");
+        IF_TYPES.put("13", "proteon-80Mbit");
+        IF_TYPES.put("14", "hyperchannel");
+        IF_TYPES.put("15", "fddi");
+        IF_TYPES.put("16", "lapb");
+        IF_TYPES.put("17", "sdlc");
+        IF_TYPES.put("18", "ds1");
+        IF_TYPES.put("19", "e1");
+        IF_TYPES.put("20", "basicISDN");
+        IF_TYPES.put("21", "primaryISDN");
+        IF_TYPES.put("22", "propPointToPointSerial");
+        IF_TYPES.put("23", "ppp");
+        IF_TYPES.put("24", "softwareLoopback");
+        IF_TYPES.put("25", "eon");
+        IF_TYPES.put("26", "ethernet-3Mbit");
+        IF_TYPES.put("27", "nsip");
+        IF_TYPES.put("28", "slip");
+        IF_TYPES.put("29", "ultra");
+        IF_TYPES.put("30", "ds3");
+        IF_TYPES.put("31", "sip");
+        IF_TYPES.put("32", "frame-relay");
     }
 
-    public GetIfXTableHelper() {}
+    public GetIfXTableHelper() {
+    }
 
-    public HelperReply callHelper(Query query)
-    {
+    @Override
+    public HelperReply callHelper(Query query) {
         try {
             AbstractTarget target = Manager.getTarget(query);
             TableUtils tableWalker = Manager.getTableUtils(PDU.GETNEXT);
 
             List<TableEvent> snmpReply = tableWalker.getTable(
-                    target, columns, null, null);
+                    target, COLUMNS, null, null);
 
             Iterator<TableEvent> it = snmpReply.iterator();
             TableEvent evt;
@@ -112,7 +112,7 @@ public class GetIfXTableHelper implements HelperInterface {
             while (it.hasNext()) {
                 rowCount += 1;
                 evt = it.next();
-                VariableBinding[]   vbs = evt.getColumns();
+                VariableBinding[] vbs = evt.getColumns();
                 HelperTableRow row = new HelperTableRow();
                 row.addItem("ifIndex", vbs[0].getVariable().toString());
                 row.addItem("ifDescr", vbs[1].getVariable().toString());
@@ -125,11 +125,11 @@ public class GetIfXTableHelper implements HelperInterface {
                 table.setId("SelectNetworkInterfaces");
                 table.setStatus(HelperReply.FAILURE);
                 table.setMessage(
-                        "Unable to get an interfaces list from the host." +
-                        "The cause may be : \n" +
-                        "- a partial implementation of the SNMP protocol, \n" +
-                        "- an access control denied the Sysmo SNMP manager, \n" +
-                        "- the host does not support mib2 ifXtable extensions");
+                        "Unable to get an interfaces list from the host."
+                        + "The cause may be : \n"
+                        + "- a partial implementation of the SNMP protocol, \n"
+                        + "- an access control denied the Sysmo SNMP manager, \n"
+                        + "- the host does not support mib2 ifXtable extensions");
             } else {
                 table.setId("SelectNetworkInterfaces");
                 table.setStatus(HelperReply.SUCCESS);
@@ -141,7 +141,7 @@ public class GetIfXTableHelper implements HelperInterface {
             }
             return table;
 
-        } catch (Exception|Error e) {
+        } catch (Exception | Error e) {
             HelperSimpleReply simple = new HelperSimpleReply();
             simple.setId("SelectNetworkInterfaces");
             simple.setStatus(HelperReply.FAILURE);
@@ -150,10 +150,11 @@ public class GetIfXTableHelper implements HelperInterface {
         }
     }
 
-    private static String getType(String type)
-    {
-        String val = iftype.get(type);
-        if (val == null) return "unknown(" + type + ")";
+    private static String getType(String type) {
+        String val = IF_TYPES.get(type);
+        if (val == null) {
+            return "unknown(" + type + ")";
+        }
         return val;
     }
 }

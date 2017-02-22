@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -30,35 +29,35 @@ import java.nio.file.FileSystems;
 import java.net.InetAddress;
 
 import io.sysmo.nchecks.Status;
+import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CheckICMP implements CheckInterface
-{
-    private static Logger logger = LoggerFactory.getLogger(CheckICMP.class);
+public class CheckICMP implements CheckInterface {
 
-    private String  host        = "";
-    private int     pktsNumber  = 5;
-    private int     pktsSize    = 56;
-    private int     plWarning   = 50;
-    private int     plCritical  = 100;
-    private int     msWarning   = 200;
-    private int     msCritical  = 2500;
-    private int     msTimeout   = 5000;
-    private int     msInterval  = 100;
-    private String  useIpv6     = "false";
-    private String  stdoutReturn;
-    private String  stderrReturn;
-    private static  String  pping;
+    private static Logger LOGGER = LoggerFactory.getLogger(CheckICMP.class);
 
-    public static void setPping(String utilsDir)
-    {
+    private String host = "";
+    private int pktsNumber = 5;
+    private int pktsSize = 56;
+    private int plWarning = 50;
+    private int plCritical = 100;
+    private int msWarning = 200;
+    private int msCritical = 2500;
+    private int msTimeout = 5000;
+    private int msInterval = 100;
+    private String useIpv6 = "false";
+    private String stdoutReturn;
+    private String stderrReturn;
+    private static String pping;
+
+    public static void setPping(String utilsDir) {
 
         String utilsPath = FileSystems
-                    .getDefault()
-                    .getPath(utilsDir)
-                    .toAbsolutePath()
-                    .toString();
+                .getDefault()
+                .getPath(utilsDir)
+                .toAbsolutePath()
+                .toString();
 
         String ppingExe;
         if (System.getProperty("os.name").contains("Windows")) {
@@ -68,60 +67,74 @@ public class CheckICMP implements CheckInterface
         }
 
         pping = FileSystems
-                    .getDefault()
-                    .getPath(utilsPath, ppingExe)
-                    .toString();
+                .getDefault()
+                .getPath(utilsPath, ppingExe)
+                .toString();
     }
 
-    public CheckICMP() {}
+    public CheckICMP() {
+    }
 
-    private void setReturnString(String returnString, String returnStream)
-    {
-        if ("stdout".equals(returnStream))
-        {
+    private void setReturnString(String returnString, String returnStream) {
+        if ("stdout".equals(returnStream)) {
             this.stdoutReturn = returnString;
-        }
-        else if ("stderr".equals(returnStream))
-        {
+        } else if ("stderr".equals(returnStream)) {
             this.stderrReturn = returnString;
         }
     }
 
-    public Reply execute(Query query)
-    {
+    @Override
+    public Reply execute(Query query) {
         Reply reply = new Reply();
 
-        Argument hostArg     = query.get("host");
-        Argument numberArg   = query.get("pkts_number");
-        Argument sizeArg     = query.get("pkts_size");
-        Argument plWarnArg   = query.get("pl_warning");
-        Argument plCritArg   = query.get("pl_critical");
-        Argument msWarnArg   = query.get("ms_warning");
-        Argument msCritArg   = query.get("ms_critical");
-        Argument timeoutArg  = query.get("ms_timeout");
+        Argument hostArg = query.get("host");
+        Argument numberArg = query.get("pkts_number");
+        Argument sizeArg = query.get("pkts_size");
+        Argument plWarnArg = query.get("pl_warning");
+        Argument plCritArg = query.get("pl_critical");
+        Argument msWarnArg = query.get("ms_warning");
+        Argument msCritArg = query.get("ms_critical");
+        Argument timeoutArg = query.get("ms_timeout");
         Argument intervalArg = query.get("ms_interval");
-        Argument useV6Arg    = query.get("useIpv6");
+        Argument useV6Arg = query.get("useIpv6");
 
         try {
-            if (hostArg     != null) { this.host        = hostArg.asString(); }
-            if (numberArg   != null) { this.pktsNumber  = numberArg.asInteger(); }
-            if (sizeArg     != null) { this.pktsSize    = sizeArg.asInteger(); }
-            if (plWarnArg   != null) { this.plWarning   = plWarnArg.asInteger(); }
-            if (plCritArg   != null) { this.plCritical  = plCritArg.asInteger(); }
-            if (msWarnArg   != null) { this.msWarning   = msWarnArg.asInteger(); }
-            if (msCritArg   != null) { this.msCritical  = msCritArg.asInteger(); }
-            if (timeoutArg  != null) { this.msTimeout   = timeoutArg.asInteger(); }
-            if (intervalArg != null) { this.msInterval  = intervalArg.asInteger(); }
-            if (useV6Arg    != null) { this.useIpv6     = useV6Arg.asString(); }
-        } catch (Exception|Error e) {
-            CheckICMP.logger.error(e.getMessage(), e);
+            if (hostArg != null) {
+                this.host = hostArg.asString();
+            }
+            if (numberArg != null) {
+                this.pktsNumber = numberArg.asInteger();
+            }
+            if (sizeArg != null) {
+                this.pktsSize = sizeArg.asInteger();
+            }
+            if (plWarnArg != null) {
+                this.plWarning = plWarnArg.asInteger();
+            }
+            if (plCritArg != null) {
+                this.plCritical = plCritArg.asInteger();
+            }
+            if (msWarnArg != null) {
+                this.msWarning = msWarnArg.asInteger();
+            }
+            if (msCritArg != null) {
+                this.msCritical = msCritArg.asInteger();
+            }
+            if (timeoutArg != null) {
+                this.msTimeout = timeoutArg.asInteger();
+            }
+            if (intervalArg != null) {
+                this.msInterval = intervalArg.asInteger();
+            }
+            if (useV6Arg != null) {
+                this.useIpv6 = useV6Arg.asString();
+            }
+        } catch (Exception | Error e) {
+            CheckICMP.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Missing argument or argument type is wrong: " + e);
             return reply;
         }
-
-
-
 
         if ("".equals(host)) {
             reply.setStatus(Status.ERROR);
@@ -133,8 +146,8 @@ public class CheckICMP implements CheckInterface
         try {
             addr = InetAddress.getByName(host);
             this.host = addr.getHostAddress();
-        } catch (Exception e) {
-            CheckICMP.logger.error(e.getMessage(), e);
+        } catch (UnknownHostException e) {
+            CheckICMP.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Host lookup fail for: " + host);
             return reply;
@@ -143,7 +156,7 @@ public class CheckICMP implements CheckInterface
         String[] cmd;
         String[] args = new String[2];
         args[0] = pping;
-        args[1] = "--host="     + this.host;
+        args[1] = "--host=" + this.host;
         //args[2] = "--interval=" + this.msInterval;
         //args[3] = "--ipv6="     + this.useIpv6;
         //args[4] = "--number="   + this.pktsNumber;
@@ -155,8 +168,7 @@ public class CheckICMP implements CheckInterface
         try {
             String osName = System.getProperty("os.name");
 
-            if (osName.startsWith("Windows"))
-            {
+            if (osName.startsWith("Windows")) {
                 cmd = new String[args.length + 2];
                 if (osName.equals("Windows 95")) {
                     cmd[0] = "command.com";
@@ -165,16 +177,12 @@ public class CheckICMP implements CheckInterface
                 }
                 cmd[1] = "/C";
                 System.arraycopy(args, 0, cmd, 2, args.length);
-            }
-            else if (osName.equals("Linux"))
-            {
+            } else if (osName.equals("Linux")) {
                 cmd = new String[3];
                 cmd[0] = "/bin/sh";
                 cmd[1] = "-c";
                 cmd[2] = args[0] + " " + args[1];
-            }
-            else
-            {
+            } else {
                 cmd = args;
             }
 
@@ -189,8 +197,8 @@ public class CheckICMP implements CheckInterface
             stdoutConsumer.join();
             stderrConsumer.join();
 
-        } catch (Exception e) {
-            CheckICMP.logger.error(e.getMessage(), e);
+        } catch (InterruptedException | IOException e) {
+            CheckICMP.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             String errorMsg = e + e.getMessage();
             reply.setReply(errorMsg);
@@ -203,22 +211,21 @@ public class CheckICMP implements CheckInterface
             return reply;
         }
 
-
         String[] ppingReturn = stdoutReturn.split(",");
-        if (! "<PPING_RETURN>".equals(ppingReturn[0])) {
+        if (!"<PPING_RETURN>".equals(ppingReturn[0])) {
             reply.setStatus(Status.ERROR);
             reply.setReply(String.format("CheckICMP ERROR: stdout=%s, stderr=%s", stderrReturn, stdoutReturn));
             return reply;
         }
 
-        long percentLoss  = Long.parseLong(ppingReturn[1]);
+        long percentLoss = Long.parseLong(ppingReturn[1]);
         long minReplyTime = Long.parseLong(ppingReturn[2]);
         long avgReplyTime = Long.parseLong(ppingReturn[3]);
         long maxReplyTime = Long.parseLong(ppingReturn[4]);
-        reply.putPerformance("PercentLost",         percentLoss);
-        reply.putPerformance("MinRoundTrip",        minReplyTime);
-        reply.putPerformance("AverageRoundTrip",    avgReplyTime);
-        reply.putPerformance("MaxRoundTrip",        maxReplyTime);
+        reply.putPerformance("PercentLost", percentLoss);
+        reply.putPerformance("MinRoundTrip", minReplyTime);
+        reply.putPerformance("AverageRoundTrip", avgReplyTime);
+        reply.putPerformance("MaxRoundTrip", maxReplyTime);
 
         Status st;
         if (percentLoss == 100) {
@@ -239,21 +246,21 @@ public class CheckICMP implements CheckInterface
 
         return reply;
     }
-
     // utility classes
+
     static private class StreamConsumer extends Thread {
-        private InputStream     is;
-        private String          type;
-        private StringBuffer    replyString;
-        private CheckICMP       parent;
+
+        private final InputStream is;
+        private final String type;
+        private final StringBuffer replyString;
+        private final CheckICMP parent;
 
         StreamConsumer(
                 InputStream inputStream,
-                String      type,
-                CheckICMP   parent)
-        {
-            this.is     = inputStream;
-            this.type   = type;
+                String type,
+                CheckICMP parent) {
+            this.is = inputStream;
+            this.type = type;
             this.replyString = new StringBuffer();
             this.parent = parent;
         }
@@ -270,12 +277,13 @@ public class CheckICMP implements CheckInterface
                 }
                 this.parent.setReturnString(replyString.toString(), type);
             } catch (IOException e) {
-                CheckICMP.logger.error(e.getMessage(), e);
+                CheckICMP.LOGGER.error(e.getMessage(), e);
             } finally {
-                if(buff != null) {
-                    try { buff.close(); }
-                    catch(Exception ignore) {
-                        CheckICMP.logger.error("failed to close the buffer for ICMP");
+                if (buff != null) {
+                    try {
+                        buff.close();
+                    } catch (IOException ignore) {
+                        CheckICMP.LOGGER.error("failed to close the buffer for ICMP");
                     }
                 }
             }

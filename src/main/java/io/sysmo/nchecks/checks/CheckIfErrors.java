@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -32,25 +31,26 @@ import org.snmp4j.util.TableEvent;
 import java.util.Iterator;
 import java.util.List;
 
-
 /**
  * Definition of the check is in the file CheckIfErrors.xml
  */
 public class CheckIfErrors implements CheckInterface {
-    private static Logger logger = LoggerFactory.getLogger(CheckIfErrors.class);
-    private static String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
-    private static String IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
-    private static String IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20";
 
-    private static OID[] columns = new OID[]{
-            new OID(IF_INDEX),
-            new OID(IF_IN_ERRORS),
-            new OID(IF_OUT_ERRORS)
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckIfErrors.class);
+    private static final String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
+    private static final String IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
+    private static final String IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20";
+
+    private static final OID[] columns = new OID[]{
+        new OID(IF_INDEX),
+        new OID(IF_IN_ERRORS),
+        new OID(IF_OUT_ERRORS)
     };
 
     public CheckIfErrors() {
     }
 
+    @Override
     public Reply execute(Query query) {
         Reply reply = new Reply();
         String error = "undefined";
@@ -63,7 +63,7 @@ public class CheckIfErrors implements CheckInterface {
             warningThreshold = query.get("warning_threshold").asInteger();
             criticalThreshold = query.get("critical_threshold").asInteger();
         } catch (Exception | Error e) {
-            CheckIfErrors.logger.error(e.getMessage(), e);
+            CheckIfErrors.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Missing or wrong argument: " + e);
             return reply;
@@ -80,18 +80,16 @@ public class CheckIfErrors implements CheckInterface {
         walker.addColumn(IF_INDEX);
         walker.addColumn(IF_IN_ERRORS);
         walker.addColumn(IF_OUT_ERRORS);
-        for (String index: indexesArrayString) {
+        for (String index : indexesArrayString) {
             walker.addIndex(index);
         }
 
         try {
 
-
             List<TableEvent> snmpReply = walker.walk(query);
 
             // TODO check the last element of the list see TableUtils.getTable
             // and TableEvent.getStatus()
-
             // asList for List.contains
             List<Integer> intList = walker.getIndexes();
 
@@ -134,11 +132,10 @@ public class CheckIfErrors implements CheckInterface {
             reply.setReply(replyMsg);
             return reply;
         } catch (Exception | Error e) {
-            CheckIfErrors.logger.error(e.getMessage(), e);
+            CheckIfErrors.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Error: " + error + ". " + e.getMessage());
             return reply;
         }
     }
 }
-

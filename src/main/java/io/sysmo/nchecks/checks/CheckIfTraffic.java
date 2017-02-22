@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -39,24 +38,25 @@ import java.util.List;
 /**
  * Definition of the check is in the file CheckIfTraffic.xml
  */
-public class CheckIfTraffic implements CheckInterface
-{
-    private static Logger logger = LoggerFactory.getLogger(CheckIfTraffic.class);
-    private static String IF_INDEX      = "1.3.6.1.2.1.2.2.1.1";
-    private static String IF_IN_OCTETS  = "1.3.6.1.2.1.2.2.1.10";
-    private static String IF_OUT_OCTETS = "1.3.6.1.2.1.2.2.1.16";
+public class CheckIfTraffic implements CheckInterface {
 
-    private static OID[] columns = new OID[]{
-            new OID(IF_INDEX),
-            new OID(IF_IN_OCTETS),
-            new OID(IF_OUT_OCTETS)
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckIfTraffic.class);
+    private static final String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
+    private static final String IF_IN_OCTETS = "1.3.6.1.2.1.2.2.1.10";
+    private static final String IF_OUT_OCTETS = "1.3.6.1.2.1.2.2.1.16";
+
+    private static final OID[] COLUMNS = new OID[]{
+        new OID(IF_INDEX),
+        new OID(IF_IN_OCTETS),
+        new OID(IF_OUT_OCTETS)
     };
 
-    public CheckIfTraffic() {}
+    public CheckIfTraffic() {
+    }
 
-    public Reply execute(Query query)
-    {
-        Reply  reply = new Reply();
+    @Override
+    public Reply execute(Query query) {
+        Reply reply = new Reply();
         String error = "undefined";
         String ifSelection;
         int warningThreshold;
@@ -66,8 +66,8 @@ public class CheckIfTraffic implements CheckInterface
             ifSelection = query.get("if_selection").asString();
             warningThreshold = query.get("warning_threshold").asInteger();
             criticalThreshold = query.get("critical_threshold").asInteger();
-        } catch (Exception|Error e) {
-            CheckIfTraffic.logger.error(e.getMessage(), e);
+        } catch (Exception | Error e) {
+            CheckIfTraffic.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Missing or wrong argument: " + e);
             return reply;
@@ -104,12 +104,11 @@ public class CheckIfTraffic implements CheckInterface
             AbstractTarget target = Manager.getTarget(query);
             TableUtils tableWalker = Manager.getTableUtils(PDU.GETNEXT);
             List<TableEvent> snmpReply = tableWalker.getTable(
-                    target, CheckIfTraffic.columns,
+                    target, CheckIfTraffic.COLUMNS,
                     lowerBoundIndex, upperBoundIndex);
 
             // TODO check the last element of the list see TableUtils.getTable
             // and TableEvent.getStatus()
-
             // asList for List.contains
             List<Integer> intList = Arrays.asList(indexesArrayInt);
             Iterator<TableEvent> it = snmpReply.iterator();
@@ -117,7 +116,7 @@ public class CheckIfTraffic implements CheckInterface
             while (it.hasNext()) {
                 evt = it.next();
                 error = evt.getErrorMessage();
-                VariableBinding[]   vbs = evt.getColumns();
+                VariableBinding[] vbs = evt.getColumns();
                 Integer ifIndex = vbs[0].getVariable().toInt();
 
                 if (intList.contains(ifIndex)) {
@@ -152,8 +151,8 @@ public class CheckIfTraffic implements CheckInterface
             reply.setStatus(newStatus);
             reply.setReply(replyMsg);
             return reply;
-        } catch (Exception|Error e) {
-            CheckIfTraffic.logger.error(e.getMessage(), e);
+        } catch (Exception | Error e) {
+            CheckIfTraffic.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Error: " + error);
             return reply;

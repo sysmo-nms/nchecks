@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -36,44 +35,45 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CheckNetworkInterfaces implements CheckInterface
-{
-    static Logger logger =
-            LoggerFactory.getLogger(CheckNetworkInterfaces.class);
-    private static String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
-    private static String IF_IN_OCTETS = "1.3.6.1.2.1.2.2.1.10";
-    private static String IF_IN_UCASTPKTS = "1.3.6.1.2.1.2.2.1.11";
-    private static String IF_IN_NUCASTPKTS = "1.3.6.1.2.1.2.2.1.12";
-    private static String IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
-    private static String IF_OUT_OCTETS = "1.3.6.1.2.1.2.2.1.16";
-    private static String IF_OUT_UCASTPKTS = "1.3.6.1.2.1.2.2.1.17";
-    private static String IF_OUT_NUCASTPKTS = "1.3.6.1.2.1.2.2.1.18";
-    private static String IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20";
+public class CheckNetworkInterfaces implements CheckInterface {
 
-    private static OID[] columns = new OID[]{
-            new OID(IF_INDEX),
-            new OID(IF_IN_OCTETS),
-            new OID(IF_IN_UCASTPKTS),
-            new OID(IF_IN_NUCASTPKTS),
-            new OID(IF_IN_ERRORS),
-            new OID(IF_OUT_OCTETS),
-            new OID(IF_OUT_UCASTPKTS),
-            new OID(IF_OUT_NUCASTPKTS),
-            new OID(IF_OUT_ERRORS)
+    private static final Logger LOGGER
+            = LoggerFactory.getLogger(CheckNetworkInterfaces.class);
+    private static final String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
+    private static final String IF_IN_OCTETS = "1.3.6.1.2.1.2.2.1.10";
+    private static final String IF_IN_UCASTPKTS = "1.3.6.1.2.1.2.2.1.11";
+    private static final String IF_IN_NUCASTPKTS = "1.3.6.1.2.1.2.2.1.12";
+    private static final String IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
+    private static final String IF_OUT_OCTETS = "1.3.6.1.2.1.2.2.1.16";
+    private static final String IF_OUT_UCASTPKTS = "1.3.6.1.2.1.2.2.1.17";
+    private static final String IF_OUT_NUCASTPKTS = "1.3.6.1.2.1.2.2.1.18";
+    private static final String IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20";
+
+    private static final OID[] COLUMNS = new OID[]{
+        new OID(IF_INDEX),
+        new OID(IF_IN_OCTETS),
+        new OID(IF_IN_UCASTPKTS),
+        new OID(IF_IN_NUCASTPKTS),
+        new OID(IF_IN_ERRORS),
+        new OID(IF_OUT_OCTETS),
+        new OID(IF_OUT_UCASTPKTS),
+        new OID(IF_OUT_NUCASTPKTS),
+        new OID(IF_OUT_ERRORS)
     };
 
-    public CheckNetworkInterfaces() {}
+    public CheckNetworkInterfaces() {
+    }
 
-    public Reply execute(Query query)
-    {
-        Reply  reply = new Reply();
+    @Override
+    public Reply execute(Query query) {
+        Reply reply = new Reply();
         String error = "undefined";
         String ifSelection;
 
         try {
             ifSelection = query.get("if_selection").asString();
-        } catch (Exception|Error e) {
-            CheckNetworkInterfaces.logger.error(e.getMessage(), e);
+        } catch (Exception | Error e) {
+            CheckNetworkInterfaces.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Missing or wrong argument: " + e);
             return reply;
@@ -104,19 +104,18 @@ public class CheckNetworkInterfaces implements CheckInterface
             AbstractTarget target = Manager.getTarget(query);
             TableUtils tableWalker = Manager.getTableUtils(PDU.GETNEXT);
             List<TableEvent> snmpReply = tableWalker.getTable(
-                    target, CheckNetworkInterfaces.columns,
+                    target, CheckNetworkInterfaces.COLUMNS,
                     lowerBoundIndex, upperBoundIndex);
 
             // TODO degrade to PDU.GETNEXT if some vb(s) == null
             // TODO check if reply is valid. Where is is the error status?
-
             List<Integer> intList = Arrays.asList(indexesArrayInt);
             Iterator<TableEvent> it = snmpReply.iterator();
             TableEvent evt;
             while (it.hasNext()) {
                 evt = it.next();
                 error = evt.getErrorMessage();
-                VariableBinding[]   vbs = evt.getColumns();
+                VariableBinding[] vbs = evt.getColumns();
                 Integer ifIndex = vbs[0].getVariable().toInt();
 
                 if (intList.contains(ifIndex)) {
@@ -140,12 +139,11 @@ public class CheckNetworkInterfaces implements CheckInterface
                 }
             }
 
-
             reply.setStatus(Status.OK);
             reply.setReply("IfPerTableTest success fetch for: " + ifSelection);
             return reply;
-        } catch (Exception|Error e) {
-            CheckNetworkInterfaces.logger.error(e.getMessage(), e);
+        } catch (Exception | Error e) {
+            CheckNetworkInterfaces.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Error: " + error);
             return reply;

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -39,20 +38,22 @@ import java.util.List;
  * Definition of the check is in the file CheckIfNonUnicast.xml
  */
 public class CheckIfNonUnicast implements CheckInterface {
-    private static Logger logger = LoggerFactory.getLogger(CheckIfNonUnicast.class);
-    private static String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
-    private static String IF_IN_NON_UNICAST = "1.3.6.1.2.1.2.2.1.12";
-    private static String IF_OUT_NON_UNICAST = "1.3.6.1.2.1.2.2.1.18";
 
-    private static OID[] columns = new OID[]{
-            new OID(IF_INDEX),
-            new OID(IF_IN_NON_UNICAST),
-            new OID(IF_OUT_NON_UNICAST)
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckIfNonUnicast.class);
+    private static final String IF_INDEX = "1.3.6.1.2.1.2.2.1.1";
+    private static final String IF_IN_NON_UNICAST = "1.3.6.1.2.1.2.2.1.12";
+    private static final String IF_OUT_NON_UNICAST = "1.3.6.1.2.1.2.2.1.18";
+
+    private static final OID[] columns = new OID[]{
+        new OID(IF_INDEX),
+        new OID(IF_IN_NON_UNICAST),
+        new OID(IF_OUT_NON_UNICAST)
     };
 
     public CheckIfNonUnicast() {
     }
 
+    @Override
     public Reply execute(Query query) {
         Reply reply = new Reply();
         String error = "undefined";
@@ -65,7 +66,7 @@ public class CheckIfNonUnicast implements CheckInterface {
             warningThreshold = query.get("warning_threshold").asInteger();
             criticalThreshold = query.get("critical_threshold").asInteger();
         } catch (Exception | Error e) {
-            CheckIfNonUnicast.logger.error(e.getMessage(), e);
+            CheckIfNonUnicast.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Missing or wrong argument: " + e);
             return reply;
@@ -106,7 +107,6 @@ public class CheckIfNonUnicast implements CheckInterface {
 
             // TODO check the last element of the list see TableUtils.getTable
             // and TableEvent.getStatus()
-
             // asList for List.contains
             List<Integer> intList = Arrays.asList(indexesArrayInt);
             Iterator<TableEvent> it = snmpReply.iterator();
@@ -147,7 +147,7 @@ public class CheckIfNonUnicast implements CheckInterface {
             reply.setReply(replyMsg);
             return reply;
         } catch (Exception | Error e) {
-            CheckIfNonUnicast.logger.error(e.getMessage(), e);
+            CheckIfNonUnicast.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("Error: " + error);
             return reply;

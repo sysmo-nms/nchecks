@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.states;
 
 import io.sysmo.nchecks.Status;
@@ -36,17 +35,18 @@ import java.util.Map;
  *
  */
 public class PerformanceGroupState implements Serializable {
-    private int pduType;
+
+    private final int pduType;
     private Status status;
     private Date time;
     private HashMap<Integer, Long> olderData;
     private HashMap<Integer, Long> newerData;
-    private static Logger logger = LoggerFactory.getLogger(PerformanceGroupState.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceGroupState.class);
 
     public PerformanceGroupState() {
-        this.time      = null;
-        this.pduType   = PDU.GETNEXT;
-        this.status    = Status.UNKNOWN;
+        this.time = null;
+        this.pduType = PDU.GETNEXT;
+        this.status = Status.UNKNOWN;
         this.olderData = null;
         this.newerData = new HashMap<>();
     }
@@ -63,16 +63,16 @@ public class PerformanceGroupState implements Serializable {
     }
 
     /**
-     * Take two counter entries from different dates, compare to critical
-     * and warning values and return the appropriate status.
+     * Take two counter entries from different dates, compare to critical and
+     * warning values and return the appropriate status.
      *
-     * @param warning  the warning threshold
+     * @param warning the warning threshold
      * @param critical the critical threshold
      * @return the new state
      */
     public Status computeStatusMaps(int warning, int critical) {
 
-        PerformanceGroupState.logger.debug(
+        PerformanceGroupState.LOGGER.debug(
                 "Before first call: {} {} {} {} {}", this.time,
                 this.olderData, this.newerData, this.status, this.pduType);
         if (this.time == null) {
@@ -82,7 +82,7 @@ public class PerformanceGroupState implements Serializable {
             this.newerData = null;
             return this.status;
         }
-        PerformanceGroupState.logger.debug(
+        PerformanceGroupState.LOGGER.debug(
                 "After first call: {} {} {} {} {}", this.time,
                 this.olderData, this.newerData, this.status, this.pduType);
 
@@ -102,7 +102,6 @@ public class PerformanceGroupState implements Serializable {
             keepWorstState = false;
             minutes = seconds / 60;
         }
-
 
         Status newStatus = Status.OK;
         // if one of the key reach threshold value set the new status.
