@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks.checks;
 
 import io.sysmo.nchecks.CheckInterface;
@@ -29,29 +28,30 @@ import io.sysmo.nchecks.Status;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-public class CheckTCP implements CheckInterface
-{
+public class CheckTCP implements CheckInterface {
+
     private static Logger logger = LoggerFactory.getLogger(CheckTCP.class);
 
-    private String  host        = "";
-    private int     port        = 0;
-    private int     msWarning   = 500;
-    private int     msCritical  = 2500;
-    private int     msTimeout   = 5000;
-    private Status  refuseState = Status.CRITICAL;
-    private Status  acceptState = Status.OK;
+    private String host = "";
+    private int port = 0;
+    private int msWarning = 500;
+    private int msCritical = 2500;
+    private int msTimeout = 5000;
+    private Status refuseState = Status.CRITICAL;
+    private Status acceptState = Status.OK;
 
-    public CheckTCP() {}
+    public CheckTCP() {
+    }
 
-    public Reply execute(Query query)
-    {
+    @Override
+    public Reply execute(Query query) {
         Reply reply = new Reply();
 
-        Argument hostArg        = query.get("host");
-        Argument portArg        = query.get("port");
-        Argument msWarningArg   = query.get("ms_warning");
-        Argument msCriticalArg  = query.get("ms_critical");
-        Argument msTimeoutArg   = query.get("ms_timeout");
+        Argument hostArg = query.get("host");
+        Argument portArg = query.get("port");
+        Argument msWarningArg = query.get("ms_warning");
+        Argument msCriticalArg = query.get("ms_critical");
+        Argument msTimeoutArg = query.get("ms_timeout");
         Argument refuseStateArg = query.get("refuse");
         Argument acceptStateArg = query.get("accept");
         /* TODO
@@ -59,27 +59,36 @@ public class CheckTCP implements CheckInterface
         Argument escapeChars    = query.get("escape_chars");
         Argument send_string    = query.get("send_string");
         Argument expect_string  = query.get("expect_string");
-        */
+         */
 
         try {
-            if (hostArg         != null) { host = hostArg.asString(); }
-            if (portArg         != null) { port = portArg.asInteger(); }
-            if (msWarningArg    != null) { msWarning = msWarningArg.asInteger(); }
-            if (msCriticalArg   != null) { msCritical = msCriticalArg.asInteger(); }
-            if (msTimeoutArg    != null) { msTimeout = msTimeoutArg.asInteger(); }
-            if (refuseStateArg  != null) {
+            if (hostArg != null) {
+                host = hostArg.asString();
+            }
+            if (portArg != null) {
+                port = portArg.asInteger();
+            }
+            if (msWarningArg != null) {
+                msWarning = msWarningArg.asInteger();
+            }
+            if (msCriticalArg != null) {
+                msCritical = msCriticalArg.asInteger();
+            }
+            if (msTimeoutArg != null) {
+                msTimeout = msTimeoutArg.asInteger();
+            }
+            if (refuseStateArg != null) {
                 refuseState = Status.fromString(refuseStateArg.asString());
             }
-            if (acceptStateArg  != null) {
+            if (acceptStateArg != null) {
                 acceptState = Status.fromString(acceptStateArg.asString());
             }
-        } catch (Exception|Error e) {
+        } catch (Exception | Error e) {
             CheckTCP.logger.info(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckTCP ERROR: Bad or wrong arguments: " + e.getMessage());
             return reply;
         }
-
 
         if (port == 0 || port > 65535) {
             CheckTCP.logger.info("Bad port definition: " + port);
@@ -98,14 +107,13 @@ public class CheckTCP implements CheckInterface
             return reply;
         }
 
-
-        Socket  sock = new Socket();
+        Socket sock = new Socket();
         long start;
         long stop;
         try {
             start = System.nanoTime();
             sock.connect(new InetSocketAddress(addr, port), msTimeout);
-            stop  = System.nanoTime();
+            stop = System.nanoTime();
             sock.close();
         } catch (Exception e) {
             reply.setReply("CheckTCP " + refuseState.toString() + " " + e.getMessage());
@@ -116,8 +124,7 @@ public class CheckTCP implements CheckInterface
         long elapsed = (stop - start) / 1000000;
         reply.putPerformance("ReplyDuration", elapsed);
         Status st;
-        if (Status.OK.equals(acceptState))
-        {
+        if (Status.OK.equals(acceptState)) {
             if (elapsed >= msCritical) {
                 st = Status.CRITICAL;
             } else if (elapsed >= msWarning) {
@@ -129,7 +136,7 @@ public class CheckTCP implements CheckInterface
             st = acceptState;
         }
         reply.setStatus(st);
-        reply.setReply("CheckTCP " + st + " Time elapsed: "  + elapsed + " milliseconds");
+        reply.setReply("CheckTCP " + st + " Time elapsed: " + elapsed + " milliseconds");
         return reply;
     }
 }
