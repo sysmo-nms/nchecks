@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.sysmo.nchecks;
 
 import com.ericsson.otp.erlang.OtpMbox;
@@ -46,79 +45,82 @@ import java.nio.file.Paths;
  * Provide berkley db store for NChecks checks state.
  */
 public class StateServer {
-    public  static final int DEFAULT_PORT = 9760;
+
+    public static final int DEFAULT_PORT = 9760;
     private static final String DB_NAME = "NCHECKS_STATES";
-    private static Database db;
-    private static Environment env;
-    private static Logger logger = LoggerFactory.getLogger(StateServer.class);
-    private static OtpMbox mbox;
-    private static StateServerSocket server;
-    private static final Object lock = new Object();
-    private static boolean started = false;
+    private static Database DB;
+    private static Environment ENV;
+    private static Logger LOGGER;
+    private static OtpMbox MBOX;
+    private static StateServerSocket SERVER;
+    private static final Object LOCK = new Object();
+    private static boolean STARTED = false;
 
     public static void main(final String[] args) {
+        StateServer.LOGGER = LoggerFactory.getLogger(StateServer.class);
         String dataDir = args[0];
         int port = Integer.parseInt(args[1]);
 
         try {
             StateServer.start(dataDir, port, null);
         } catch (IOException e) {
-            e.printStackTrace();
+            StateServer.LOGGER.error(e.getMessage(), e);
         }
     }
 
     public static boolean isStarted() {
-        return StateServer.started;
+        return StateServer.STARTED;
     }
 
     public static synchronized void start(
             final String dataDir, int port,
-            final OtpMbox mbox) throws IOException
-    {
-        StateServer.started = true;
-        if (port == 0) { port = StateServer.DEFAULT_PORT; }
+            final OtpMbox mbox) throws IOException {
+        StateServer.STARTED = true;
+        if (port == 0) {
+            port = StateServer.DEFAULT_PORT;
+        }
 
-        StateServer.logger = LoggerFactory.getLogger(StateServer.class);
-        StateServer.mbox = mbox;
+        StateServer.LOGGER = LoggerFactory.getLogger(StateServer.class);
+        StateServer.MBOX = mbox;
 
         // init db
         String home = Paths.get(dataDir, "states").toString();
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
-        StateServer.env = new Environment(new File(home), envConfig);
+        StateServer.ENV = new Environment(new File(home), envConfig);
 
         DatabaseConfig dbConfig = new DatabaseConfig();
         dbConfig.setAllowCreate(true);
         dbConfig.setTemporary(true);
-        StateServer.db = StateServer.env.openDatabase(
+        StateServer.DB = StateServer.ENV.openDatabase(
                 null, StateServer.DB_NAME, dbConfig);
-        StateServer.logger.info("database ok");
+        StateServer.LOGGER.info("database ok");
 
-        StateServer.server = new StateServerSocket(port);
-        Thread serverThread = new Thread(server);
+        StateServer.SERVER = new StateServerSocket(port);
+        Thread serverThread = new Thread(SERVER);
         serverThread.start();
-        StateServer.logger.info("server listening on " + port);
+        StateServer.LOGGER.info("server listening on " + port);
 
     }
 
     public static void stop() {
-        StateServer.started = false;
-        if (StateServer.mbox != null) {
-            StateServer.mbox.exit("crash");
+        StateServer.STARTED = false;
+        if (StateServer.MBOX != null) {
+            StateServer.MBOX.exit("crash");
         }
-        StateServer.db.close();
-        StateServer.env.close();
-        StateServer.server.stop();
-        StateServer.mbox.close();
-        StateServer.logger.info("end run");
+        StateServer.DB.close();
+        StateServer.ENV.close();
+        StateServer.SERVER.stop();
+        StateServer.MBOX.close();
+        StateServer.LOGGER.info("end run");
     }
 
     public static byte[] getState(String key) {
-        synchronized (StateServer.lock) {
+        synchronized (StateServer.LOCK) {
             try {
                 DatabaseEntry theKey = new DatabaseEntry(key.getBytes("UTF-8"));
                 DatabaseEntry data = new DatabaseEntry();
-                if (StateServer.db.get(null, theKey, data,
+                if (StateServer.DB.get(null, theKey, data,
                         LockMode.DEFAULT) == OperationStatus.SUCCESS) {
                     return data.getData();
                 } else {
@@ -127,30 +129,29 @@ public class StateServer {
                     return new byte[0];
                 }
             } catch (UnsupportedEncodingException e) {
-                StateServer.logger.warn(e.getMessage(), e);
+                StateServer.LOGGER.warn(e.getMessage(), e);
                 return new byte[0];
             }
         }
     }
 
     public static void setState(String key, byte[] value) {
-        synchronized (StateServer.lock) {
+        synchronized (StateServer.LOCK) {
             try {
                 DatabaseEntry theKey = new DatabaseEntry(key.getBytes("UTF-8"));
                 DatabaseEntry theData = new DatabaseEntry(value);
-                StateServer.db.put(null, theKey, theData);
+                StateServer.DB.put(null, theKey, theData);
             } catch (UnsupportedEncodingException e) {
-                StateServer.logger.warn(e.getMessage(), e);
+                StateServer.LOGGER.warn(e.getMessage(), e);
             }
         }
     }
 
+    static class StateServerSocket implements Runnable {
 
-    static class StateServerSocket implements Runnable
-    {
         // server loop
         private ServerSocket server = null;
-        private Logger logger;
+        private final Logger logger;
         private boolean normalShutdown = false;
 
         StateServerSocket(int port) throws IOException {
@@ -161,56 +162,60 @@ public class StateServer {
 
         public void stop() {
             this.logger.info("stop socket listener");
-            if (this.server != null) try {
-                this.normalShutdown = true;
-                this.server.close();
-                this.server = null;
-            } catch (IOException e) {
-                // ignore
+            if (this.server != null) {
+                try {
+                    this.normalShutdown = true;
+                    this.server.close();
+                    this.server = null;
+                } catch (IOException e) {
+                    // ignore
+                }
             }
         }
 
         @Override
         public void run() {
             this.logger.info("Start socket listener");
-            while (true) try {
+            while (true) {
+                try {
 
-                Socket client = this.server.accept();
-                client.setTcpNoDelay(true);
-                Runnable clientRunnable = new ServerClientSocket(client);
-                Thread clientThread = new Thread(clientRunnable);
-                clientThread.start();
-                this.logger.debug("have accepted client");
+                    Socket client = this.server.accept();
+                    client.setTcpNoDelay(true);
+                    Runnable clientRunnable = new ServerClientSocket(client);
+                    Thread clientThread = new Thread(clientRunnable);
+                    clientThread.start();
+                    this.logger.debug("have accepted client");
 
-            } catch (Exception | Error e) {
-                if (this.normalShutdown) {
-                    this.logger.info(e.getMessage(), e);
-                } else {
-                    this.logger.error(e.getMessage(), e);
-                    if (this.server != null) {
-                        try {
-                            this.server.close();
-                        } catch (IOException ignore) {
-                            // ignore
+                } catch (Exception | Error e) {
+                    if (this.normalShutdown) {
+                        this.logger.info(e.getMessage(), e);
+                    } else {
+                        this.logger.error(e.getMessage(), e);
+                        if (this.server != null) {
+                            try {
+                                this.server.close();
+                            } catch (IOException ignore) {
+                                // ignore
+                            }
                         }
                     }
+                    break;
                 }
-                break;
             }
             StateServer.stop();
         }
     }
 
-
     static class ServerClientSocket implements Runnable {
-        private Socket socket;
-        private Logger logger;
+
+        private final Socket socket;
+        private final Logger logger;
 
         ServerClientSocket(Socket socket) {
             this.logger = LoggerFactory.getLogger(this.getClass());
             this.socket = socket;
-            this.logger.debug("Accept client for socket: " +
-                    socket.getInetAddress());
+            this.logger.debug("Accept client for socket: "
+                    + socket.getInetAddress());
         }
 
         @Override
@@ -231,47 +236,52 @@ public class StateServer {
 
                 StateMessage message;
                 StateMessage reply;
-                while (this.socket.isConnected()) try {
+                while (this.socket.isConnected()) {
+                    try {
 
-                    message = (StateMessage) in.readObject();
+                        message = (StateMessage) in.readObject();
 
-                    switch (message.getAction()) {
-                        case StateMessage.SET:
-                            key = message.getKey();
-                            bytes = message.getObjectBytes();
-                            StateServer.setState(key, bytes);
-                            break;
-                        case StateMessage.GET:
-                            key = message.getKey();
-                            bytes = StateServer.getState(key);
-                            reply = new StateMessage(StateMessage.GET);
-                            reply.setKey(key);
-                            reply.setBytes(bytes);
-                            out.writeObject(reply);
-                            out.flush();
-                            break;
-                        default:
+                        switch (message.getAction()) {
+                            case StateMessage.SET:
+                                key = message.getKey();
+                                bytes = message.getObjectBytes();
+                                StateServer.setState(key, bytes);
+                                break;
+                            case StateMessage.GET:
+                                key = message.getKey();
+                                bytes = StateServer.getState(key);
+                                reply = new StateMessage(StateMessage.GET);
+                                reply.setKey(key);
+                                reply.setBytes(bytes);
+                                out.writeObject(reply);
+                                out.flush();
+                                break;
+                            default:
                             // nothing
-                    }
+                        }
 
-                } catch (Exception inner) {
-                    break;
+                    } catch (IOException | ClassNotFoundException inner) {
+                        break;
+                    }
                 }
 
-
-            } catch (Exception e) {
+            } catch (IOException e) {
                 this.logger.warn(e.getMessage(), e);
             } finally {
-                if (in != null) try {
-                    in.close();
-                } catch (IOException ignore) {
-                    // ignore
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ignore) {
+                        // ignore
+                    }
                 }
 
-                if (out != null) try {
-                    out.close();
-                } catch (IOException ignore) {
-                    // ignore
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException ignore) {
+                        // ignore
+                    }
                 }
 
                 try {

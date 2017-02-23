@@ -41,7 +41,6 @@ public class CheckHTTP implements CheckInterface {
         String uri = null;
         String ok_status = null;
         String method = null;
-        String follow = null;
         boolean follow_directive = true;
 
         try {
@@ -54,8 +53,9 @@ public class CheckHTTP implements CheckInterface {
             if (method_arg != null) {
                 method = method_arg.asString();
             }
+
             if (follow_arg != null) {
-                follow = follow_arg.asString();
+                String follow = follow_arg.asString();
                 if (follow.equals("false")) {
                     follow_directive = false;
                 }

@@ -41,7 +41,7 @@ public class CheckIfErrors implements CheckInterface {
     private static final String IF_IN_ERRORS = "1.3.6.1.2.1.2.2.1.14";
     private static final String IF_OUT_ERRORS = "1.3.6.1.2.1.2.2.1.20";
 
-    private static final OID[] columns = new OID[]{
+    private static final OID[] COLUMNS = new OID[]{
         new OID(IF_INDEX),
         new OID(IF_IN_ERRORS),
         new OID(IF_OUT_ERRORS)

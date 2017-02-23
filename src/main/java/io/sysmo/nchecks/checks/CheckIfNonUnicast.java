@@ -44,7 +44,7 @@ public class CheckIfNonUnicast implements CheckInterface {
     private static final String IF_IN_NON_UNICAST = "1.3.6.1.2.1.2.2.1.12";
     private static final String IF_OUT_NON_UNICAST = "1.3.6.1.2.1.2.2.1.18";
 
-    private static final OID[] columns = new OID[]{
+    private static final OID[] COLUMNS = new OID[]{
         new OID(IF_INDEX),
         new OID(IF_IN_NON_UNICAST),
         new OID(IF_OUT_NON_UNICAST)
@@ -102,7 +102,7 @@ public class CheckIfNonUnicast implements CheckInterface {
             AbstractTarget target = Manager.getTarget(query);
             TableUtils tableWalker = Manager.getTableUtils(state.getPduType());
             List<TableEvent> snmpReply = tableWalker.getTable(
-                    target, CheckIfNonUnicast.columns,
+                    target, CheckIfNonUnicast.COLUMNS,
                     lowerBoundIndex, upperBoundIndex);
 
             // TODO check the last element of the list see TableUtils.getTable

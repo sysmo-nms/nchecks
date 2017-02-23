@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class CheckICMP implements CheckInterface {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CheckICMP.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckICMP.class);
 
     private String host = "";
     private int pktsNumber = 5;
