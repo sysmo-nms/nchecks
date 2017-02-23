@@ -37,10 +37,12 @@
                 <Usage>Get this URI. Will return CRITICAL if the return is not equal to the "ok_status".</Usage>
             </Flag>
             <Flag Id="ok_status">
+                <Default>2**</Default>
                 <Hint>The "ok" return status ex: "401", "2**"</Hint>
                 <Usage>The HTTP return status considered correct. Default is "2**"</Usage>
             </Flag>
             <Flag Id="method">
+                <Default>GET</Default>
                 <Hint>ex: "GET", "POST"</Hint>
                 <Usage>The HTTP method used for the check.</Usage>
             </Flag>
