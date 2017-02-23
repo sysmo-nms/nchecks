@@ -24,7 +24,7 @@ import org.slf4j.Logger;
  */
 public class CheckHTTP implements CheckInterface {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CheckTCP.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckTCP.class);
 
     public CheckHTTP() {
 
@@ -36,10 +36,14 @@ public class CheckHTTP implements CheckInterface {
         Argument uri_arg = query.get("uri");
         Argument ok_status_arg = query.get("ok_status");
         Argument method_arg = query.get("method");
+        Argument follow_arg = query.get("follow_redirect");
 
         String uri = null;
         String ok_status = null;
         String method = null;
+        String follow = null;
+        boolean follow_directive = true;
+
         try {
             if (uri_arg != null) {
                 uri = uri_arg.asString();
@@ -49,6 +53,12 @@ public class CheckHTTP implements CheckInterface {
             }
             if (method_arg != null) {
                 method = method_arg.asString();
+            }
+            if (follow_arg != null) {
+                follow = follow_arg.asString();
+                if (follow.equals("false")) {
+                    follow_directive = false;
+                }
             }
         } catch (Exception | Error e) {
             CheckHTTP.LOGGER.info(e.getMessage(), e);
@@ -78,6 +88,7 @@ public class CheckHTTP implements CheckInterface {
         }
 
         con.setRequestProperty("User-Agent", "NChecks CheckHTTP/1.0");
+        con.setInstanceFollowRedirects(follow_directive);
         if (!"".equals(method)) {
             try {
                 con.setRequestMethod(method);

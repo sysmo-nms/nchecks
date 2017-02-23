@@ -46,6 +46,11 @@
                 <Hint>ex: "GET", "POST"</Hint>
                 <Usage>The HTTP method used for the check.</Usage>
             </Flag>
+            <Flag Id="follow_redirect">
+                <Default>true</Default>
+                <Hint>"true" or "false"</Hint>
+                <Usage>Follow redirection of an url.</Usage>
+            </Flag>
         </FlagTable>
 
 
