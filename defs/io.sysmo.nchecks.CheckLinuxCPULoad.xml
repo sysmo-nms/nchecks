@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~  Copyright 2015-2016 Sebastien Serre <ssbx@sysmo.io>
+~
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~     http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
+<NChecks xmlns="http://schemas.sysmo.io/2015/NChecks">
+    <Check
+        Id="io.sysmo.nchecks.CheckLinuxCPULoad"
+        Version="1.0"
+        Class="io.sysmo.nchecks.checks.CheckLinuxCPULoad">
+
+        <Author><![CDATA[Sebastien Serre (ssbx@sysmo.io)]]></Author>
+        <AuthorUrl>http://www.sysmo.io</AuthorUrl>
+        <UpdatesUrl>http://www.sysmo.io/nchecks/updates/CheckLinuxCPULoad/</UpdatesUrl>
+
+        <Description>CheckLinuxCPULoad raise a CRITICAL or WARNING alert if interfaces errors exceed thresholds.</Description>
+        <Overview> </Overview>
+
+        <Require Ressource="snmp" />
+
+        <FlagTable>
+            <Flag Id="warning_threshold">
+                <Hint>Integer representing an average load minute.</Hint>
+                <Usage>Set the probe to WARNING state the load exceed "warning_threshold"</Usage>
+                <Default>80</Default>
+            </Flag>
+            <Flag Id="critical_threshold">
+                <Hint>Integer representing an average number of error per minute.</Hint>
+                <Usage>Set the probe to WARNING state the load exceed "warning_threshold"</Usage>
+                <Default>100</Default>
+            </Flag>
+        </FlagTable>
+
+        <Performances Type="simple" >
+            <FileName>CheckLinuxCPULoad.rrd</FileName>
+            <DataSourceTable>
+                <DataSource Id="cpuLoad1mn"       Type="GAUGE" />
+                <DataSource Id="cpuLoad5mn"       Type="GAUGE" />
+                <DataSource Id="cpuLoad20mn"      Type="GAUGE" />
+            </DataSourceTable>
+            <GraphTable>
+                <Graph
+                    Id="CPULoad"
+                    Minimum="0"
+                    Maximum=""
+                    Rigid="false"
+                    Base="1000"
+                    Unit=""
+                    UnitExponent="0" >
+                    <Title>CPU Load</Title>
+                    <VerticalLabel>Load</VerticalLabel>
+                    <Draw
+                        Type="area"
+                        DataSource="cpuLoad1mn"
+                        Consolidation="MAX"
+                        Color="#204A87AA" >
+                        Max load over 1 minute
+                    </Draw>
+                    <Draw
+                        Type="area"
+                        DataSource="cpuLoad5mn"
+                        Consolidation="AVERAGE"
+                        Color="#20ff87AA" >
+                        Average load over 5 minute
+                    </Draw>
+                    <Draw
+                        Type="area"
+                        DataSource="cpuLoad5mn"
+                        Consolidation="MIN"
+                        Color="#ff4A87AA" >
+                        Minimum load over 20 minute
+                    </Draw>
+                </Graph>
+            </GraphTable>
+        </Performances>
+    </Check>
+</NChecks>

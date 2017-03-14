@@ -116,6 +116,10 @@ public class Manager {
 
     }
 
+    public static Snmp getManager() {
+        return Manager.instance.snmp4jSession;
+    }
+
     public static TableUtils getTableUtils(int pduType) {
         switch (pduType) {
             case PDU.GETNEXT:
