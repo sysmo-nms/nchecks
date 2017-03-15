@@ -47,7 +47,7 @@
             <DataSourceTable>
                 <DataSource Id="cpuLoad1mn"       Type="GAUGE" />
                 <DataSource Id="cpuLoad5mn"       Type="GAUGE" />
-                <DataSource Id="cpuLoad20mn"      Type="GAUGE" />
+                <DataSource Id="cpuLoad15mn"      Type="GAUGE" />
             </DataSourceTable>
             <GraphTable>
                 <Graph
@@ -57,7 +57,7 @@
                     Rigid="false"
                     Base="1000"
                     Unit=""
-                    UnitExponent="0" >
+                    UnitExponent="-6" >
                     <Title>CPU Load</Title>
                     <VerticalLabel>Load</VerticalLabel>
                     <Draw
@@ -76,7 +76,7 @@
                     </Draw>
                     <Draw
                         Type="area"
-                        DataSource="cpuLoad5mn"
+                        DataSource="cpuLoad15mn"
                         Consolidation="MIN"
                         Color="#ff4A87AA" >
                         Minimum load over 20 minute

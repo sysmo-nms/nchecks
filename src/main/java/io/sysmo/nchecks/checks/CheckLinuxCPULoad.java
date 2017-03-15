@@ -81,9 +81,13 @@ public class CheckLinuxCPULoad implements CheckInterface {
             PDU respPDU = resp.getResponse();
             List<? extends VariableBinding> respBindings = respPDU.getVariableBindings();
 
-            reply.putPerformance("cpuLoad1mn", respBindings.get(0).getVariable().toLong());
-            reply.putPerformance("cpuLoad5mn", respBindings.get(1).getVariable().toLong());
-            reply.putPerformance("cpuLoad20mn", respBindings.get(2).getVariable().toLong());
+            float one = Float.parseFloat(respBindings.get(0).getVariable().toString()) * 100;
+            float five = Float.parseFloat(respBindings.get(1).getVariable().toString()) * 100;
+            float fifteen = Float.parseFloat(respBindings.get(2).getVariable().toString()) * 100;
+
+            reply.putPerformance("cpuLoad1mn", (long) one);
+            reply.putPerformance("cpuLoad5mn", (long) five);
+            reply.putPerformance("cpuLoad15mn", (long) fifteen);
             reply.setStatus(Status.OK);
             reply.setReply("CheckLinuxCPULoad OK");
             return reply;

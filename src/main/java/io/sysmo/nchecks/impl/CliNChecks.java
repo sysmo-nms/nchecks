@@ -6,6 +6,7 @@
 package io.sysmo.nchecks.impl;
 
 import io.sysmo.nchecks.Query;
+import io.sysmo.nchecks.SimpleQuery;
 import io.sysmo.nchecks.Reply;
 import io.sysmo.nchecks.Argument;
 import io.sysmo.nchecks.snmp.Manager;
@@ -54,7 +55,7 @@ public class CliNChecks {
             query_args.put(parts[0], new Argument(parts[1]));
         }
 
-        Query query = new Query(query_args);
+        Query query = new SimpleQuery(query_args);
         Reply reply = check.execute(query);
         LOGGER.info(reply.toString());
 

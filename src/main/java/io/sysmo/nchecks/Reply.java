@@ -56,11 +56,9 @@ public class Reply {
     @Override
     public String toString() {
         String perfs = "";
-        Iterator it = this.perfValues.entrySet().iterator();
 
-        while (it.hasNext()) {
-            Entry pair = (Entry) it.next();
-            perfs += "\n\t" + pair.getKey() + ":\t" + pair.getValue().toString();
+        for (Entry<String, PerformanceGroup> e : this.perfValues.entrySet()) {
+            perfs += "\n\t" + e.getKey() + ":\t" + e.getValue().toString();
         }
 
         return "\n ReplyMsg: \t" + this.replyMsg
