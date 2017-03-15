@@ -6,13 +6,20 @@
     <xs:complexType name="Flag" parent="">
         <xs:attribute name="Id" type="xs:string"/>
         <xs:sequence>
-            <xs:element name="Default" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Default" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Put here the default value for this flag</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="Usage" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="Hint" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 
     <xs:simpleType name="DataSourceType">
+        <xs:annotation>
+            <xs:documentation>RRD databases value type. Can be GAUGE or COUNTER</xs:documentation>
+        </xs:annotation>
         <xs:restriction base="xs:string">
             <xs:enumeration value="GAUGE"/>
             <xs:enumeration value="COUNTER"/>
@@ -20,6 +27,9 @@
     </xs:simpleType>
 
     <xs:simpleType name="DrawType">
+        <xs:annotation>
+            <xs:documentation>RRD draw type. Can be line, area or stack</xs:documentation>
+        </xs:annotation>
         <xs:restriction base="xs:string">
             <xs:enumeration value="line"/>
             <xs:enumeration value="area"/>
@@ -28,6 +38,9 @@
     </xs:simpleType>
 
     <xs:simpleType name="DrawConsolidationType">
+        <xs:annotation>
+            <xs:documentation>RRD consolidation type. Can be MIN, AVERAGE or MAX</xs:documentation>
+        </xs:annotation>
         <xs:restriction base="xs:string">
             <xs:enumeration value="MIN"/>
             <xs:enumeration value="AVERAGE"/>
