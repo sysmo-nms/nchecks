@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="Flag">
+        <xs:attribute name="Id" type="xs:string"/>
+        <xs:sequence>
+            <xs:element name="Default" type="xs:string"/>
+            <xs:element name="Usage" type="xs:string"/>
+            <xs:element name="Hint" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="DataSource">
+        <xs:attribute name="Id" type="xs:string"/>
+        <xs:attribute name="Type" type="xs:string"/>
+    </xs:simpleType>
+
+    <xs:element name="Draw" type="xs:string">
+        <xs:attribute name="Type" type="xs:string"/>
+        <xs:attribute name="DataSource" type="xs:string"/>
+        <xs:attribute name="Consolidation" type="xs:string"/>
+        <xs:attribute name="Color" type="xs:string"/>
+    </xs:element>
+
+    <xs:complexType name="Graph">
+        <xs:attribute name="Id" type="xs:string"/>
+        <xs:attribute name="Minimum" type="xs:string"/>
+        <xs:attribute name="Maximum" type="xs:string"/>
+        <xs:attribute name="Rigid" type="xs:string"/>
+        <xs:attribute name="Base" type="xs:string"/>
+        <xs:attribute name="Unit" type="xs:string"/>
+        <xs:attribute name="UnitExponent" type="xs:string"/>
+        <xs:sequence>
+            <xs:element name="Title" type="xs:string"/>
+            <xs:element name="VerticalLabel" type="xs:string"/>
+            <xs:list type="Draw"/>
+        </xs:sequence>
+
+    </xs:complexType>
+
+    <xs:simpleType name="NChecks">
+        <xs:complexType name="Check">
+            <xs:attribute name="Id" type="xs:string"/>
+            <xs:attribute name="Version" type="xs:string"/>
+            <xs:attribute name="Class" type="xs:string"/>
+
+            <xs:sequence>
+                <xs:element name="Author" type="xs:string"/>
+                <xs:element name="AuthorUrl" type="xs:string"/>
+                <xs:element name="UpdatesUrl" type="xs:string"/>
+                <xs:element name="Description" type="xs:string"/>
+                <xs:element name="Overview" type="xs:string"/>
+                <xs:simpleType name="FlagTable">
+                    <xs:list itemType="Flag"/>
+                </xs:simpleType>
+                <xs:complexType name="Performances">
+                    <xs:attribute name="Type" type="xs:string"/>
+                    <xs:sequence>
+                        <xs:element name="FileName" type="xs:string" />
+                        <xs:simpleType name="DataSourceTable">
+                            <xs:list itemType="DataSource"/>
+                        </xs:simpleType>
+                        <xs:simpleType name="GraphTable">
+                            <xs:list itemType="Graph"/>
+                        </xs:simpleType>
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:simpleType>
+
+</xs:schema>
