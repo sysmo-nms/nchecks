@@ -94,9 +94,9 @@ public class CheckLinuxCPULoad implements CheckInterface {
                 status = Status.OK;
             }
 
-            reply.putPerformance("cpuLoad1mn", (long) (one * 100));
-            reply.putPerformance("cpuLoad5mn", (long) (five * 100));
-            reply.putPerformance("cpuLoad15mn", (long) (fifteen * 100));
+            reply.putPerformance("cpuLoad1mn", (long) (one * 1000));
+            reply.putPerformance("cpuLoad5mn", (long) (five * 1000));
+            reply.putPerformance("cpuLoad15mn", (long) (fifteen * 1000));
             reply.setStatus(status);
             reply.setReply("CheckLinuxCPULoad " + status);
             return reply;

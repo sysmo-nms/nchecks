@@ -57,8 +57,8 @@
                     Maximum=""
                     Rigid="false"
                     Base="1000"
-                    Unit=""
-                    UnitExponent="-6" >
+                    Unit="Load"
+                    UnitExponent="3" >
                     <Title>CPU Load</Title>
                     <VerticalLabel>Load</VerticalLabel>
                     <Draw
@@ -80,7 +80,7 @@
                         DataSource="cpuLoad15mn"
                         Consolidation="MIN"
                         Color="#ff4A87AA" >
-                        Minimum load over 20 minute
+                        Minimum load over 15 minute
                     </Draw>
                 </Graph>
             </GraphTable>
