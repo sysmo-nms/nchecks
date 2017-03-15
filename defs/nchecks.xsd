@@ -3,24 +3,47 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified">
 
-    <xs:complexType name="Flag">
+    <xs:complexType name="Flag" parent="">
         <xs:attribute name="Id" type="xs:string"/>
         <xs:sequence>
-            <xs:element name="Default" type="xs:string"/>
-            <xs:element name="Usage" type="xs:string"/>
-            <xs:element name="Hint" type="xs:string"/>
+            <xs:element name="Default" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Usage" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="Hint" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 
+    <xs:simpleType name="DataSourceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="GAUGE"/>
+            <xs:enumeration value="COUNTER"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DrawType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="line"/>
+            <xs:enumeration value="area"/>
+            <xs:enumeration value="stack"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DrawConsolidationType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="MIN"/>
+            <xs:enumeration value="AVERAGE"/>
+            <xs:enumeration value="MAX"/>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:simpleType name="DataSource">
         <xs:attribute name="Id" type="xs:string"/>
-        <xs:attribute name="Type" type="xs:string"/>
+        <xs:attribute name="Type" type="DataSourceType"/>
     </xs:simpleType>
 
     <xs:element name="Draw" type="xs:string">
-        <xs:attribute name="Type" type="xs:string"/>
+        <xs:attribute name="Type" type="DrawType"/>
         <xs:attribute name="DataSource" type="xs:string"/>
-        <xs:attribute name="Consolidation" type="xs:string"/>
+        <xs:attribute name="Consolidation" type="DrawConsolidationType"/>
         <xs:attribute name="Color" type="xs:string"/>
     </xs:element>
 
@@ -37,37 +60,42 @@
             <xs:element name="VerticalLabel" type="xs:string"/>
             <xs:list type="Draw"/>
         </xs:sequence>
-
     </xs:complexType>
 
-    <xs:simpleType name="NChecks">
-        <xs:complexType name="Check">
+    <xs:simpleType name="PerformanceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="simple"/>
+            <xs:enumeration value="table"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="NChecks" minOccurs="1" maxOccurs="1">
+        <xs:complexType name="Check" minOccurs="1" maxOccurs="1">
             <xs:attribute name="Id" type="xs:string"/>
             <xs:attribute name="Version" type="xs:string"/>
             <xs:attribute name="Class" type="xs:string"/>
 
             <xs:sequence>
-                <xs:element name="Author" type="xs:string"/>
-                <xs:element name="AuthorUrl" type="xs:string"/>
-                <xs:element name="UpdatesUrl" type="xs:string"/>
-                <xs:element name="Description" type="xs:string"/>
-                <xs:element name="Overview" type="xs:string"/>
-                <xs:simpleType name="FlagTable">
-                    <xs:list itemType="Flag"/>
+                <xs:element name="Author" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="AuthorUrl" type="xs:anyURI" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="UpdatesUrl" type="xs:anyURI" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="Description" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="Overview" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:simpleType name="FlagTable" minOccurs="1" maxOccurs="1">
+                    <xs:list itemType="Flag" minOccurs="0"/>
                 </xs:simpleType>
-                <xs:complexType name="Performances">
-                    <xs:attribute name="Type" type="xs:string"/>
+                <xs:complexType name="Performances" minOccurs="1" maxOccurs="1">
+                    <xs:attribute name="Type" type="PerformanceType"/>
                     <xs:sequence>
-                        <xs:element name="FileName" type="xs:string" />
-                        <xs:simpleType name="DataSourceTable">
-                            <xs:list itemType="DataSource"/>
+                        <xs:element name="FileName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                        <xs:simpleType name="DataSourceTable" minOccurs="1" maxOccurs="1" >
+                            <xs:list itemType="DataSource" minOccurs="1"/>
                         </xs:simpleType>
-                        <xs:simpleType name="GraphTable">
-                            <xs:list itemType="Graph"/>
+                        <xs:simpleType name="GraphTable" minOccurs="1" maxOccurs="1">
+                            <xs:list itemType="Graph" minOccurs="0"/>
                         </xs:simpleType>
                     </xs:sequence>
                 </xs:complexType>
-
             </xs:sequence>
         </xs:complexType>
     </xs:simpleType>
