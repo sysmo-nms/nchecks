@@ -19,6 +19,10 @@ public class Argument {
 
     private String argument;
 
+    public Argument(String arg) {
+        this.argument = arg;
+    }
+
     public Argument() {
         this.argument = "";
     }

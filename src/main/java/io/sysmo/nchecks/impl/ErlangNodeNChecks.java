@@ -64,8 +64,8 @@ public class ErlangNodeNChecks implements Runnable {
     // nchecks vars
     private final ThreadPoolExecutor threadPool;
 
-    static ErlangNodeNChecks instance = null;
-    static Logger logger = LoggerFactory.getLogger(ErlangNodeNChecks.class);
+    static ErlangNodeNChecks INSTANCE = null;
+    static Logger LOGGER = LoggerFactory.getLogger(ErlangNodeNChecks.class);
 
     /**
      * Start a Nchecks application that communicate with an erlang server.
@@ -85,11 +85,11 @@ public class ErlangNodeNChecks implements Runnable {
             final String rubyDir, final String utilsDir,
             final String etcDir, final InetAddress stateServer,
             final int stateServerPort) throws Exception {
-        if (ErlangNodeNChecks.instance == null) {
-            ErlangNodeNChecks.instance = new ErlangNodeNChecks(mbox, nodeName, rubyDir,
+        if (ErlangNodeNChecks.INSTANCE == null) {
+            ErlangNodeNChecks.INSTANCE = new ErlangNodeNChecks(mbox, nodeName, rubyDir,
                     utilsDir, etcDir, stateServer, stateServerPort);
         }
-        return ErlangNodeNChecks.instance;
+        return ErlangNodeNChecks.INSTANCE;
     }
 
     private ErlangNodeNChecks(
@@ -100,7 +100,7 @@ public class ErlangNodeNChecks implements Runnable {
         this.nodeName = nodeName;
         this.mbox = mbox;
 
-        ErlangNodeNChecks.logger.info("ruby dir is: " + rubyDir);
+        ErlangNodeNChecks.LOGGER.info("ruby dir is: " + rubyDir);
 
         // init thread pool
         this.threadPool = new ThreadPoolExecutor(
@@ -113,15 +113,15 @@ public class ErlangNodeNChecks implements Runnable {
 
         // initialize special CheckICMP class
         CheckICMP.setPping(utilsDir);
-        ErlangNodeNChecks.logger.info("CheckICMP init with path: " + utilsDir);
+        ErlangNodeNChecks.LOGGER.info("CheckICMP init with path: " + utilsDir);
 
         // initialize .rb script cache
         NChecksJRuby.startJRubyCache(rubyDir, etcDir);
-        ErlangNodeNChecks.logger.info("JRuby init with path: " + rubyDir);
+        ErlangNodeNChecks.LOGGER.info("JRuby init with path: " + rubyDir);
 
         // initialize snmpman
         Manager.start(etcDir);
-        ErlangNodeNChecks.logger.info("SNMP started");
+        ErlangNodeNChecks.LOGGER.info("SNMP started");
 
         // initialize state client
         StateClient.start(stateServer, stateServerPort);
@@ -130,17 +130,17 @@ public class ErlangNodeNChecks implements Runnable {
     @Override
     public void run() {
         // loop and wait for calls
-        ErlangNodeNChecks.logger.info("begin too loop");
+        ErlangNodeNChecks.LOGGER.info("begin too loop");
         OtpErlangObject call;
         while (true) {
             try {
                 call = this.mbox.receive();
                 this.handleMsg(call);
             } catch (OtpErlangExit e) {
-                ErlangNodeNChecks.logger.info(e.getMessage(), e);
+                ErlangNodeNChecks.LOGGER.info(e.getMessage(), e);
                 break;
             } catch (OtpErlangDecodeException e) {
-                ErlangNodeNChecks.logger.error(e.getMessage(), e);
+                ErlangNodeNChecks.LOGGER.error(e.getMessage(), e);
                 break;
             }
         }
@@ -166,8 +166,7 @@ public class ErlangNodeNChecks implements Runnable {
         obj[2] = msg;
         OtpErlangTuple tuple = new OtpErlangTuple(obj);
         synchronized (ErlangNodeNChecks.LOCK) {
-            ErlangNodeNChecks.instance.mbox.send(
-                    "j_server_nchecks", ErlangNodeNChecks.instance.nodeName, tuple);
+            ErlangNodeNChecks.INSTANCE.mbox.send("j_server_nchecks", ErlangNodeNChecks.INSTANCE.nodeName, tuple);
         }
     }
 
@@ -193,7 +192,7 @@ public class ErlangNodeNChecks implements Runnable {
     }
 
     private void handleInit(OtpErlangTuple initMsg) {
-        ErlangNodeNChecks.logger.info("init?" + initMsg.toString());
+        ErlangNodeNChecks.LOGGER.info("init?" + initMsg.toString());
     }
 
     private void handleMsg(final OtpErlangObject msg) {
@@ -207,7 +206,7 @@ public class ErlangNodeNChecks implements Runnable {
             caller = tuple.elementAt(1);
             payload = (OtpErlangTuple) (tuple.elementAt(2));
         } catch (Exception | Error e) {
-            ErlangNodeNChecks.logger.warn(
+            ErlangNodeNChecks.LOGGER.warn(
                     "Fail to decode tuple: " + e.getMessage(), e);
             return;
         }
@@ -259,7 +258,7 @@ public class ErlangNodeNChecks implements Runnable {
                     ErlangNodeNChecks.sendReply(caller, reply);
             }
         } catch (Exception | Error e) {
-            ErlangNodeNChecks.logger.error(e.getMessage(), e);
+            ErlangNodeNChecks.LOGGER.error(e.getMessage(), e);
             OtpErlangTuple reply = buildErrorReply(
                     new OtpErlangString("ErlangNodeNChecks error: " + e
                             + " " + command.toString() + " -> " + e.getMessage())
@@ -283,7 +282,7 @@ public class ErlangNodeNChecks implements Runnable {
                 result.put(key.stringValue(), a);
             } else {
                 // Currently only string arguments are accepted
-                ErlangNodeNChecks.logger.info("Unknown arg type: " + val);
+                ErlangNodeNChecks.LOGGER.info("Unknown arg type: " + val);
             }
         }
         return result;

@@ -6,7 +6,7 @@ apply plugin: 'findbugs'
 apply plugin: 'jdepend'
 apply plugin: 'application'
 
-mainClassName = 'io.sysmo.nchecks.impl.CommandLine'
+mainClassName = 'io.sysmo.nchecks.impl.CliNChecks'
 sourceCompatibility = 1.7
 group = "io.sysmo"
 archivesBaseName = "nchecks"

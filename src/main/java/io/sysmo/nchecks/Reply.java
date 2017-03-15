@@ -25,6 +25,8 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 /**
  * The Reply class contain all the values and data related to the execution of a
@@ -49,6 +51,24 @@ public class Reply {
         this.timestamp = System.currentTimeMillis() / 1000;
         this.perfValues = new HashMap<>();
         this.state = null;
+    }
+
+    @Override
+    public String toString() {
+        String perfs = "";
+        Iterator it = this.perfValues.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Entry pair = (Entry) it.next();
+            perfs += "\n\t" + pair.getKey() + ":\t" + pair.getValue().toString();
+        }
+
+        return "\n ReplyMsg: \t" + this.replyMsg
+                + "\n Status: \t" + this.status
+                + "\n Timestamp: \t" + this.timestamp
+                + "\n StatusCode: \t" + this.statusCode
+                + "\n Performances:" + perfs;
+
     }
 
     /**
@@ -259,6 +279,18 @@ public class Reply {
                 i++;
             }
             return new OtpErlangList(perfValuesObj);
+        }
+
+        @Override
+        public String toString() {
+            String perfs = "";
+            Iterator it = this.perfValues.entrySet().iterator();
+
+            while (it.hasNext()) {
+                Entry pair = (Entry) it.next();
+                perfs += "\n\t\t" + pair.getKey() + ":\t" + pair.getValue().toString();
+            }
+            return perfs;
         }
     }
 }

@@ -39,8 +39,8 @@ public class CheckHTTP implements CheckInterface {
         Argument follow_arg = query.get("follow_redirect");
 
         String uri = null;
-        String ok_status = null;
-        String method = null;
+        String ok_status = "2**";
+        String method = "GET";
         boolean follow_directive = true;
 
         try {
@@ -72,6 +72,7 @@ public class CheckHTTP implements CheckInterface {
             urlobj = new URL(uri);
         } catch (MalformedURLException e) {
             CheckHTTP.LOGGER.info(e.getMessage(), e);
+            CheckHTTP.LOGGER.info(uri);
             reply.setStatus(Status.ERROR);
             reply.setReply("CheckHTTP ERROR: " + e.getMessage());
             return reply;
