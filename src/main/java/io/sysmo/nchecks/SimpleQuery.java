@@ -11,7 +11,7 @@ import java.util.Map;
  * Like io.sysmo.nchecks.Query, but do not call a StateServer. Used for
  * development purpose.
  *
- * @author Sébastien Serre <sserre at msha.fr>
+ * @author Sébastien Serre
  */
 public class SimpleQuery extends Query {
 

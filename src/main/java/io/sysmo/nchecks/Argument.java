@@ -47,6 +47,16 @@ public class Argument {
     }
 
     /**
+     * Return the float representation of the argument.
+     *
+     * @return float representation of the argument
+     * @throws NumberFormatException bad number
+     */
+    public float asFloat() throws NumberFormatException {
+        return Float.parseFloat(this.argument);
+    }
+
+    /**
      * Return the string value of argument
      *
      * @return the original argument string

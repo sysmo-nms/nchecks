@@ -24,8 +24,9 @@
         <AuthorUrl>http://www.sysmo.io</AuthorUrl>
         <UpdatesUrl>http://www.sysmo.io/nchecks/updates/CheckLinuxCPULoad/</UpdatesUrl>
 
-        <Description>CheckLinuxCPULoad raise a CRITICAL or WARNING alert if interfaces errors exceed thresholds.</Description>
-        <Overview> </Overview>
+        <Description>CheckLinuxCPULoad raise a CRITICAL or WARNING if the 15min load average exceed the thresholds.</Description>
+        <Overview>
+            Check https://github.com/sysmo-nms/sysmo-nms.github.io/wiki/Configure-SNMP-on-linux to configure you linux target. See https://en.wikipedia.org/wiki/Load_(computing) to interpret these values.</Overview>
 
         <Require Ressource="snmp" />
 
@@ -33,12 +34,12 @@
             <Flag Id="warning_threshold">
                 <Hint>Integer representing an average load minute.</Hint>
                 <Usage>Set the probe to WARNING state if the load exceed "warning_threshold"</Usage>
-                <Default>80</Default>
+                <Default>0.8</Default>
             </Flag>
             <Flag Id="critical_threshold">
                 <Hint>Integer representing an average number of error per minute.</Hint>
                 <Usage>Set the probe to WARNING state if the load exceed "warning_threshold"</Usage>
-                <Default>100</Default>
+                <Default>1.0</Default>
             </Flag>
         </FlagTable>
 

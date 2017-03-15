@@ -41,7 +41,7 @@ public class CheckLinuxCPULoad implements CheckInterface {
             = LoggerFactory.getLogger(CheckLinuxCPULoad.class);
     private static final String CPU_LOAD_1MN = "1.3.6.1.4.1.2021.10.1.3.1";
     private static final String CPU_LOAD_5MN = "1.3.6.1.4.1.2021.10.1.3.2";
-    private static final String CPU_LOAD_20MN = "1.3.6.1.4.1.2021.10.1.3.3";
+    private static final String CPU_LOAD_15MN = "1.3.6.1.4.1.2021.10.1.3.3";
 
     private final PDU pdu;
 
@@ -49,7 +49,7 @@ public class CheckLinuxCPULoad implements CheckInterface {
         this.pdu = new PDU();
         this.pdu.add(new VariableBinding(new OID(CPU_LOAD_1MN)));
         this.pdu.add(new VariableBinding(new OID(CPU_LOAD_5MN)));
-        this.pdu.add(new VariableBinding(new OID(CPU_LOAD_20MN)));
+        this.pdu.add(new VariableBinding(new OID(CPU_LOAD_15MN)));
 
     }
 
@@ -59,12 +59,12 @@ public class CheckLinuxCPULoad implements CheckInterface {
         String error = "undefined";
 
         // TODO use performance group state
-        int warningThreshold;
-        int criticalThreshold;
+        float warningThreshold;
+        float criticalThreshold;
 
         try {
-            warningThreshold = query.get("warning_threshold").asInteger();
-            criticalThreshold = query.get("critical_threshold").asInteger();
+            warningThreshold = query.get("warning_threshold").asFloat();
+            criticalThreshold = query.get("critical_threshold").asFloat();
         } catch (Exception | Error e) {
             CheckLinuxCPULoad.LOGGER.error(e.getMessage(), e);
             reply.setStatus(Status.ERROR);
@@ -81,15 +81,24 @@ public class CheckLinuxCPULoad implements CheckInterface {
             PDU respPDU = resp.getResponse();
             List<? extends VariableBinding> respBindings = respPDU.getVariableBindings();
 
-            float one = Float.parseFloat(respBindings.get(0).getVariable().toString()) * 100;
-            float five = Float.parseFloat(respBindings.get(1).getVariable().toString()) * 100;
-            float fifteen = Float.parseFloat(respBindings.get(2).getVariable().toString()) * 100;
+            float one = Float.parseFloat(respBindings.get(0).getVariable().toString());
+            float five = Float.parseFloat(respBindings.get(1).getVariable().toString());
+            float fifteen = Float.parseFloat(respBindings.get(2).getVariable().toString());
 
-            reply.putPerformance("cpuLoad1mn", (long) one);
-            reply.putPerformance("cpuLoad5mn", (long) five);
-            reply.putPerformance("cpuLoad15mn", (long) fifteen);
-            reply.setStatus(Status.OK);
-            reply.setReply("CheckLinuxCPULoad OK");
+            Status status;
+            if (fifteen > criticalThreshold) {
+                status = Status.CRITICAL;
+            } else if (fifteen > warningThreshold) {
+                status = Status.WARNING;
+            } else {
+                status = Status.OK;
+            }
+
+            reply.putPerformance("cpuLoad1mn", (long) (one * 100));
+            reply.putPerformance("cpuLoad5mn", (long) (five * 100));
+            reply.putPerformance("cpuLoad15mn", (long) (fifteen * 100));
+            reply.setStatus(status);
+            reply.setReply("CheckLinuxCPULoad " + status);
             return reply;
         } catch (Exception | Error e) {
             CheckLinuxCPULoad.LOGGER.error(e.getMessage(), e);
