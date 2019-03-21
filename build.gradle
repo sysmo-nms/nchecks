@@ -100,7 +100,7 @@ name 'nchecks monitoring library'
 packaging 'jar'
 // optionally artifactId can be defined here
 description 'nchecks monitoring library'
-url 'http://www.sysmo.io'
+url 'https://sysmo-nms.github.io'
 
 scm {
 connection 'scm:git:git@github.com:://github.com:sysmo-nms/nchecks.git'

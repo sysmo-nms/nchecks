@@ -14,9 +14,9 @@
 ~ See the License for the specific language governing permissions and
 ~ limitations under the License.
 -->
-<NChecks  xmlns="http://www.sysmo.io/nchecks/2015"
+<NChecks  xmlns="https://sysmo-nms.github.io/nchecks/2015"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.sysmo.io/nchecks/2015 nchecks.xsd">
+          xsi:schemaLocation="https://sysmo-nms.github.io/nchecks/2015 nchecks.xsd">
 
     <Check
         Id="io.sysmo.nchecks.CheckIfErrorsRb"
@@ -24,8 +24,8 @@
         Class="io.sysmo.nchecks.checks.CheckViaJRuby">
 
         <Author><![CDATA[Sebastien Serre (ssbx@sysmo.io)]]></Author>
-        <AuthorUrl>http://www.sysmo.io</AuthorUrl>
-        <UpdatesUrl>http://www.sysmo.io/nchecks/updates/CheckIfErrorsRb/</UpdatesUrl>
+        <AuthorUrl>https://sysmo-nms.github.io</AuthorUrl>
+        <UpdatesUrl>https://sysmo-nms.github.io/nchecks/updates/CheckIfErrorsRb/</UpdatesUrl>
 
         <Description>CheckIfErrorsRb raise a CRITICAL or WARNING alert if interfaces errors exceed thresholds.</Description>
         <Overview> </Overview>
